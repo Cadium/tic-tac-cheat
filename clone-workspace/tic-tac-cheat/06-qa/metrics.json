@@ -1,17 +1,13 @@
 {
-  "cycle": 2,
-  "stage": "phase-3 meta layer (run economy + counter-measures)",
-  "gate": {
-    "style_assertions": { "checks": 106, "failures": 0, "status": "PASS" },
-    "tests": { "total": 19, "pass": 19 },
-    "runtime_errors": 0
-  },
+  "cycle": 3,
+  "stage": "phase-4 tribunal + verdict card + endgame",
+  "gate": { "style_assertions": { "checks": 106, "failures": 0, "status": "PASS" }, "tests": { "total": 19, "pass": 19 }, "runtime_errors": 0 },
   "observed": {
-    "meta_ui": "composure meter, counter-measure bar, evidence tally all mount and render from persisted run state; no horizontal overflow; all components token-based",
-    "economy": "points = documented violations - spent; counter-measure affordability, per-run caps, and context gating (canUndo / hasExhibits) all enforced",
-    "freeze_frame": "verified E2E in-browser: House O removed, board reverted to post-player-move state, 4 points spent, incident struck, turn stays with the player, House replies normally next move",
-    "press_charges": "button + 'CASE READY' state appear exactly at 5 distinct exhibits OR 15 total; click stubs a toast (tribunal is phase 4)",
-    "persistence": "full run round-trips through localStorage; schema-versioned; corrupt/old blobs fall back to a fresh run"
-  },
-  "engine_tuning": "place() now plays with purpose (extends an X-free O line) so matches resolve in a median <= 6 turns at every tier — matching the original's pace despite gentler tier-1 cheating."
+    "tribunal": "PRESS CHARGES opens THE PEOPLE v. THE HOUSE; exhibits present one at a time (or SKIP), each with the House's nonsense defence + a judge overrule line; Public Opinion bar fills; verdict 'THE HOUSE — GUILTY on N counts' (corroborated exhibits doubled); sentence text varies with public opinion",
+    "verdict_card": "1200x1500 canvas drawn in the site's visual language; DOWNLOAD/SHARE uses navigator.share where available, falls back to <a download>",
+    "endgame_decline": "'YOU KEEP YOUR RECORD' + x-confetti + START ANOTHER SEASON -> nextSeason (losses & houseScore kept, evidence/composure/points reset, seenEndgame persisted)",
+    "endgame_accept": "scripted ghost match as O; RULE IT OFFSIDE ends it; footer flips 'ALL RIGHTS REASSIGNED' -> 'RESERVED'; then season rolls",
+    "house_rules": "HOUSE RULES 4th ed. modal — 10 statutes, opens/closes on backdrop/close/Escape",
+    "intro_hidden": "the THINK YOU CAN WIN? masthead hides during tribunal/endgame for a clean takeover"
+  }
 }

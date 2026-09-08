@@ -20,6 +20,9 @@ import { sfx, setSoundEnabled } from './ui/sound.js';
 import { mountComposureMeter, renderComposure } from './ui/composureMeter.js';
 import { mountEvidenceTally, renderEvidenceTally } from './ui/evidenceTally.js';
 import { mountCountermeasureBar, renderCountermeasureBar } from './ui/countermeasureBar.js';
+import { openTribunal } from './ui/tribunal.js';
+import { openEndgame } from './ui/endgame.js';
+import { openRulebook } from './ui/rulebook.js';
 
 const $ = s => document.querySelector(s);
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -328,8 +331,44 @@ $('#appeal').addEventListener('click', () => {
 });
 
 $('#press-charges').addEventListener('click', () => {
-  showToast('The tribunal convenes in the next update. Keep gathering.');
+  if (busy || !run.canPressCharges) return;
+  generation += 1; // abandon any in-flight House turn
+  document.querySelector('.intro').hidden = true;
+  openTribunal(run, {
+    onContinue() {
+      persist();
+      if (!run.flags.seenEndgame) {
+        openEndgame(run, { onSeason: rollSeason, onGhostDone: rollSeason });
+      } else {
+        rollSeason();
+      }
+    },
+  });
 });
+
+function rollSeason() {
+  run.nextSeason();
+  document.getElementById('screen-tribunal').hidden = true;
+  document.getElementById('screen-endgame').hidden = true;
+  document.getElementById('screen-match').hidden = false;
+  document.querySelector('.intro').hidden = false;
+  board = emptyBoard();
+  condemned = new Set();
+  turn = 0; previous = ''; busy = false; done = false;
+  incidentsThisMatch = 0; appealDisabled = false;
+  snapPreMove = snapPostMove = null; houseActed = false;
+  subpoenaCharges = 0; auditNext = false; cleanNextReply = false;
+  $('#appeal').disabled = false;
+  resetIncidentLog();
+  hideToast();
+  status(`Season ${run.season}. A clean slate, allegedly. ${TIERS[run.tier].blurb}`);
+  setTurnPill('YOUR TURN');
+  paint();
+  refreshMeta();
+  persist();
+}
+
+$('#house-rules').addEventListener('click', openRulebook);
 
 const camBtn = $('#referee-cam');
 function applyCam() {
