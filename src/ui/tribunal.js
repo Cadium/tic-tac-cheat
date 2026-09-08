@@ -22,7 +22,7 @@ const SENTENCE_FLAVOUR = {
   quiet: 'The gallery is silent. The House takes this as applause.',
 };
 
-export function openTribunal(run, { onContinue }) {
+export function openTribunal(run, { onContinue, standings = null }) {
   const root = document.getElementById('screen-tribunal');
   document.getElementById('screen-match').hidden = true;
   root.hidden = false;
@@ -141,7 +141,7 @@ export function openTribunal(run, { onContinue }) {
       caseNo,
       counts,
       losses: run.losses,
-      houseTotal: run.houseScore,
+      houseTotal: standings?.houseWins ? standings.houseWins.toLocaleString('en-US') : '∞',
       topExhibit: { letter: top.cls.letter, quote: top.e.first },
       url: location.host + location.pathname,
     };

@@ -1,0 +1,20 @@
+# Cloudflare Pages config. The site is static (served from the repo root); the
+# only server code is functions/api/standings.js, which needs the KV binding
+# below.
+#
+# Local:   npx wrangler pages dev .
+#          (wrangler simulates the KV namespace under .wrangler/)
+#
+# Deploy:  1. npx wrangler kv namespace create STANDINGS
+#          2. paste the returned id into `id` below
+#          3. npx wrangler pages deploy .
+#          (or bind STANDINGS to the Pages project in the Cloudflare dashboard
+#           and skip wrangler.toml entirely)
+
+name = "tic-tac-cheat"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "."
+
+[[kv_namespaces]]
+binding = "STANDINGS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"

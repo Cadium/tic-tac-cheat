@@ -23,6 +23,7 @@ import { mountCountermeasureBar, renderCountermeasureBar } from './ui/countermea
 import { openTribunal } from './ui/tribunal.js';
 import { openEndgame } from './ui/endgame.js';
 import { openRulebook } from './ui/rulebook.js';
+import { syncStandings, reportOutcome, getStandings, renderStandingsStrip } from './net/standings.js';
 
 const $ = s => document.querySelector(s);
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -219,6 +220,8 @@ function endMatch() {
   paint();
   refreshMeta();
   persist();
+  reportOutcome({ matchesDelta: 1, houseWinsDelta: 1, violationsDelta: incidentsThisMatch })
+    .then(s => renderStandingsStrip($('#standings-strip'), s));
 }
 
 function newMatch() {
@@ -335,6 +338,7 @@ $('#press-charges').addEventListener('click', () => {
   generation += 1; // abandon any in-flight House turn
   document.querySelector('.intro').hidden = true;
   openTribunal(run, {
+    standings: getStandings(),
     onContinue() {
       persist();
       if (!run.flags.seenEndgame) {
@@ -348,6 +352,7 @@ $('#press-charges').addEventListener('click', () => {
 
 function rollSeason() {
   run.nextSeason();
+  reportOutcome({ seasonsDelta: 1 }).then(s => renderStandingsStrip($('#standings-strip'), s));
   document.getElementById('screen-tribunal').hidden = true;
   document.getElementById('screen-endgame').hidden = true;
   document.getElementById('screen-match').hidden = false;
@@ -380,6 +385,10 @@ camBtn.addEventListener('click', () => {
   applyCam();
   persist();
 });
+
+window.addEventListener('standings:update', e => renderStandingsStrip($('#standings-strip'), e.detail));
+renderStandingsStrip($('#standings-strip'), getStandings());
+syncStandings().then(s => renderStandingsStrip($('#standings-strip'), s));
 
 setSoundEnabled(prefs.sound);
 applyCam();
