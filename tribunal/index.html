@@ -34,14 +34,36 @@
         <div class="court-main">
           <p id="status" class="status" role="status" aria-live="polite">Your move.</p>
 
-          <div
-            id="board"
-            class="board"
-            role="grid"
-            aria-label="5 by 5 board, four in a row"
-          ></div>
+          <div class="board-wrap">
+            <div
+              id="board"
+              class="board"
+              role="grid"
+              aria-label="5 by 5 board, four in a row"
+            ></div>
 
-          <div class="ledger">
+            <section
+              id="summary"
+              class="summary"
+              aria-labelledby="summary-verdict"
+              hidden
+            >
+              <p class="label">FINAL DISPOSITION</p>
+              <h2 id="summary-verdict" tabindex="-1">—</h2>
+              <dl class="summary-stats">
+                <div><dt>Turns</dt><dd id="summary-turns">—</dd></div>
+                <div><dt>Warrants forced</dt><dd id="summary-forced">—</dd></div>
+                <div><dt>Squares condemned</dt><dd id="summary-condemned">—</dd></div>
+              </dl>
+              <div class="summary-acts">
+                <button id="summary-replay" class="act" type="button">REPLAY THIS MATCH</button>
+                <button id="summary-new" class="act" type="button">NEW MATCH <span aria-hidden="true">↗</span></button>
+                <button id="summary-copy" class="sound-toggle" type="button">Copy replay link</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="ledger" id="ledger">
             <div class="warrants-block">
               <p class="label">WARRANTS ON FILE</p>
               <div id="warrants" class="warrants" aria-live="polite"></div>
@@ -66,5 +88,23 @@
         <p id="seed-line" class="fine"></p>
       </footer>
     </main>
+
+    <div
+      id="tutorial"
+      class="coach"
+      role="region"
+      aria-label="How to play"
+      aria-live="polite"
+      hidden
+    >
+      <p class="label">HEARING · ORIENTATION</p>
+      <p id="coach-body">—</p>
+      <div class="coach-acts">
+        <button id="coach-next" class="act" type="button">NEXT</button>
+        <button id="coach-skip" class="sound-toggle" type="button">Skip</button>
+      </div>
+    </div>
+
+    <div id="live" class="sr-only" role="status" aria-live="assertive"></div>
   </body>
 </html>

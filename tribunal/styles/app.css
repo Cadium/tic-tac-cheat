@@ -240,6 +240,75 @@ a { color: var(--focus); }
   .incident-log li.sliding { animation: none; }
 }
 
+/* ---------- match summary ---------- */
+.board-wrap { max-width: 30rem; }
+.summary {
+  margin-top: var(--s-4);
+  border: var(--rule);
+  box-shadow: var(--shadow-hard-sm);
+  background: var(--paper);
+  padding: var(--s-4);
+}
+.summary.won { box-shadow: 7px 7px 0 var(--yellow); }
+.summary h2 {
+  margin: var(--s-1) 0 var(--s-3);
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+.summary.won h2 { color: var(--red); }
+.summary h2:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.summary-stats {
+  margin: 0 0 var(--s-4);
+  display: grid;
+  gap: var(--s-2);
+  font: 400 var(--t-log) / 1.35 var(--font-mono);
+}
+.summary-stats div { display: flex; gap: var(--s-2); justify-content: space-between; }
+.summary-stats dt { color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.summary-stats dd { margin: 0; text-align: right; }
+.summary-acts { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; }
+
+/* ---------- tutorial coach ---------- */
+.coach {
+  position: fixed;
+  left: var(--s-3);
+  bottom: var(--s-3);
+  z-index: 20;
+  max-width: 22rem;
+  border: var(--rule);
+  box-shadow: var(--shadow-toast);
+  background: var(--yellow);
+  padding: var(--s-3);
+}
+.coach .label { margin-bottom: var(--s-2); }
+#coach-body { margin: 0 0 var(--s-3); font: 400 var(--t-lede) / 1.45 var(--font-mono); }
+.coach-acts { display: flex; gap: var(--s-2); align-items: center; }
+.coach .sound-toggle { background: var(--paper); }
+.coach.awaiting::after {
+  content: "waiting — your move";
+  font: 500 var(--t-label) / 1 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.warrants.coach-focus {
+  outline: 3px solid var(--ink);
+  outline-offset: 5px;
+  animation: coach-ping 1s var(--ease-stamp) 3;
+}
+@keyframes coach-ping {
+  0%, 100% { outline-offset: 5px; }
+  50% { outline-offset: 9px; }
+}
+@media (max-width: 560px) {
+  .coach { left: var(--s-2); right: var(--s-2); bottom: var(--s-2); max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .warrants.coach-focus { animation: none; }
+}
+
 /* ---------- colophon ---------- */
 .colophon {
   margin-top: var(--s-6);

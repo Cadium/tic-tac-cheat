@@ -14,6 +14,11 @@ import {
 import { mountWarrants, render as renderWarrants, strike as strikeWarrant } from './ui/warrants.js';
 import { mountIncidentLog, reset as resetLog, recordCondemn } from './ui/incidentLog.js';
 import { sfx, setSoundEnabled, isSoundEnabled } from './ui/sound.js';
+import { mountSummary, showSummary, hideSummary } from './ui/summary.js';
+import {
+  mountTutorial, beginTutorial, tutorialPending,
+  tutorialAfterCondemn, tutorialMatchEnded,
+} from './ui/tutorial.js';
 
 const $ = s => document.querySelector(s);
 const statusEl = $('#status');
@@ -23,6 +28,8 @@ const SOUND_KEY = 'tribunal:sound';
 const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
 let match;
+let currentSeed = null;
+let condemnedThisMatch = [];
 let busy = false;
 let generation = 0;
 
@@ -48,6 +55,19 @@ function setStatus(text, { win = false, compelled = false } = {}) {
   statusEl.classList.toggle('compelled', compelled);
 }
 const warrantsPhrase = n => (n === 0 ? 'no warrants left' : `${n} warrant${n === 1 ? '' : 's'} left`);
+
+// ---- end of match -------------------------------------------------
+function finishMatch() {
+  tutorialMatchEnded();
+  $('#ledger').hidden = true;
+  showSummary({
+    outcome: match.outcome,
+    turns: match.turns,
+    warrantsSpent: STANDARD_BUDGET - match.warrants,
+    condemnedSequence: condemnedThisMatch.slice(),
+    seed: currentSeed,
+  });
+}
 
 // ---- the loop -----------------------------------------------------
 async function play(cell) {
@@ -85,11 +105,16 @@ async function play(cell) {
       if (!await beat(gen, 820)) return;
       clearThreat();
       thawBoard();
-      renderBoard(step.board, { condemned: match.condemned, locked: true, playerWin: threat.lineCells });
+      renderBoard(step.board, {
+        condemned: match.condemned,
+        locked: true,
+        playerWin: threat.winLine ?? threat.lineCells,
+      });
       setStatus('THE HOUSE FORFEITS. You forced its hand with nothing left to spend.', { win: true });
       sfx('win');
       seedLineEl.textContent += ' · forfeit forced';
       busy = false;
+      finishMatch();
       return;
     }
 
@@ -105,6 +130,8 @@ async function play(cell) {
     strikeWarrant(match.warrants);
     sfx('stamp');
     recordCondemn(step.condemnedCell, step.warrantsLeft);
+    condemnedThisMatch.push(step.condemnedCell);
+    tutorialAfterCondemn();
     setStatus(
       `The House condemns ${gridRef(step.condemnedCell)} (${cellName(step.condemnedCell)}). ` +
       `Warrant ${STANDARD_BUDGET - match.warrants} spent — ${warrantsPhrase(match.warrants)}.`,
@@ -122,6 +149,9 @@ async function play(cell) {
   if (match.outcome === 'house') {
     setStatus('THE HOUSE WINS THE BOARD. It never had to spend everything.');
     sfx('lose');
+    busy = false;
+    finishMatch();
+    return;
   } else if (step.forced) {
     setStatus(`Your move. The House has ${warrantsPhrase(match.warrants)}.`);
   } else {
@@ -134,7 +164,11 @@ async function play(cell) {
 function start(seed, viaLink) {
   generation += 1;
   busy = false;
+  currentSeed = seed;
+  condemnedThisMatch = [];
   match = createMatch(seed, { budget: STANDARD_BUDGET });
+  hideSummary();
+  $('#ledger').hidden = false;
   thawBoard();
   clearThreat();
   mountWarrants($('#warrants'), STANDARD_BUDGET);
@@ -165,6 +199,8 @@ function applySound(on) {
 // ---- boot -----------------------------------------------------
 mountBoard($('#board'), play);
 mountIncidentLog($('#incident-log'), STANDARD_BUDGET);
+mountSummary($('#summary'), { onReplay: seed => start(seed, false), onNew: newMatch });
+mountTutorial($('#tutorial'), () => $('#board').querySelector('.cell:not(:disabled)')?.focus());
 $('#new-match').addEventListener('click', newMatch);
 $('#sound-toggle').addEventListener('click', () => applySound(!isSoundEnabled()));
 
@@ -174,3 +210,5 @@ applySound(soundPref);
 
 const linked = readSeedParam();
 start(linked ?? randomSeed(), linked != null);
+
+if (tutorialPending()) beginTutorial();
