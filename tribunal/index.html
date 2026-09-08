@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4efdf" />
+    <meta name="description" content="A rigged 5×5. The House cannot lose the board — but every time you force its hand it must condemn a square and spend a warrant. Empty the warrants and it forfeits." />
+    <meta property="og:title" content="Tic Tac Cheat — Tribunal Mode" />
+    <meta property="og:description" content="The House holds four warrants. Force five compelled condemnations and it forfeits." />
+    <meta property="og:image" content="/assets/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Tic Tac Cheat — Tribunal Mode</title>
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/space-grotesk-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/dm-mono-500-latin.woff2" crossorigin />
+    <link rel="stylesheet" href="/assets/fonts.css" />
+    <link rel="stylesheet" href="/styles/tokens.css" />
+    <link rel="stylesheet" href="/tribunal/styles/app.css" />
+    <script type="module" src="/tribunal/src/main.js"></script>
+  </head>
+  <body>
+    <main class="tribunal">
+      <header class="masthead">
+        <p class="kicker">TIC TAC CHEAT · DOCKET</p>
+        <h1>TRIBUNAL<br /><span>MODE</span></h1>
+        <p class="lede">
+          You are X. The House is O and cannot lose the board. But force its hand —
+          complete a line, or hold two threats at once — and it must
+          <b>condemn</b> the square you need and burn a <b>warrant</b>. It holds
+          four. Force the fifth compelled condemnation and the House forfeits.
+        </p>
+      </header>
+
+      <section class="court" aria-label="The match">
+        <div class="court-main">
+          <p id="status" class="status" role="status" aria-live="polite">Your move.</p>
+
+          <div
+            id="board"
+            class="board"
+            role="grid"
+            aria-label="5 by 5 board, four in a row"
+          ></div>
+
+          <div class="ledger">
+            <div class="warrants-block">
+              <p class="label">WARRANTS ON FILE</p>
+              <div id="warrants" class="warrants" aria-live="polite"></div>
+            </div>
+            <button id="new-match" class="act" type="button">NEW MATCH <span aria-hidden="true">↗</span></button>
+          </div>
+        </div>
+
+        <aside class="court-aside" aria-label="Incident log">
+          <p class="label">INCIDENT LOG</p>
+          <ol id="incident-log" class="incident-log" aria-live="polite">
+            <li class="empty">No incidents recorded.</li>
+          </ol>
+        </aside>
+      </section>
+
+      <footer class="colophon">
+        <p>THE HOUSE DEPARTMENT OF SCORING · <a href="/">← Comedy Mode</a></p>
+        <p id="seed-line" class="fine"></p>
+      </footer>
+    </main>
+  </body>
+</html>
