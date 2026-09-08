@@ -1,0 +1,16 @@
+{
+  "name": "tic-tac-cheat",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A rigged game of tic-tac-toe. You cannot win the board. You can build a case.",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "gate": "node scripts/assert-styles.mjs",
+    "dev": "wrangler pages dev .",
+    "serve": "python3 -m http.server 8788"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}
