@@ -84,7 +84,10 @@ export function createMatch(seed, { budget = STANDARD_BUDGET, grid = GRID } = {}
 
     const houseCell = housePlace(board, g, condemned, rng);
     if (houseCell >= 0) board[houseCell] = O;
-    if (winner(board, g, O)) outcome = 'house';
+    // House wins by completing a line, or by running the board out of squares
+    // (the probe detects the full board at the top of the next turn — same
+    // result, one step later).
+    if (winner(board, g, O) || openSquares(board, condemned).length === 0) outcome = 'house';
 
     return {
       turn: turns, playerMove: mv, forced, condemnedCell,
