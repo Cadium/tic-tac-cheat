@@ -1,0 +1,28 @@
+{
+  "routes": ["/"],
+  "themes": ["light"],
+  "measured_breakpoints": [
+    { "px": 850, "changes": "game-grid collapses 2-col -> 1-col; grid cells lose right border, gain bottom border; scorecard min-height 560px" },
+    { "px": 560, "changes": "intro padding shrinks; intro::after O slides off-right; lede loses auto left margin; game-topline stacks column; board shadow 13px -> 7px; footer stacks column" }
+  ],
+  "frameworks_hint": "none. One ES-module entry (/tic-tac-cheat/app.js) importing /tic-tac-cheat/rules.js. One stylesheet (/tic-tac-cheat/styles.css). No bundler fingerprints, no framework runtime.",
+  "fonts_loaded": [
+    "Space Grotesk 500", "Space Grotesk 600", "Space Grotesk 700",
+    "DM Mono 400", "DM Mono 500"
+  ],
+  "dead_css": [
+    ".ticker / .ticker div / @keyframes ticker — no matching HTML",
+    ".masthead — no matching HTML",
+    ".house-status / .house-status span / @keyframes pulse — no matching HTML",
+    ".eyebrow — selector grouped with .label but no .eyebrow element in DOM"
+  ],
+  "untokenised_values": [
+    "#ece5d2  — .game-shell background (only literal hex outside :root)",
+    "#1976d2  — .board button:focus-visible outline colour"
+  ],
+  "notes": [
+    "#player-score is hard-coded 0 in HTML and never written by app.js — the player literally cannot score.",
+    "Board marks are drawn by CSS ::before content ('×' U+00D7, '○' U+25CB), sized in cqw against the board's inline-size container.",
+    "prefers-reduced-motion: reduce  neutralises all animation + transition durations."
+  ]
+}

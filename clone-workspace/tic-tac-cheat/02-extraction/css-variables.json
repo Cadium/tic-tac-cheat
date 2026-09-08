@@ -1,0 +1,25 @@
+{
+  "themes": {
+    "light": {
+      "--ink": "#121212",
+      "--paper": "#f4efdf",
+      "--red": "#ed3d2b",
+      "--yellow": "#ffd438",
+      "--muted": "#777164",
+      "--line": "rgba(18, 18, 18, 0.22)"
+    }
+  },
+  "declared_on": ":root",
+  "resolved_rgb": {
+    "--ink": "rgb(18, 18, 18)",
+    "--paper": "rgb(244, 239, 223)",
+    "--red": "rgb(237, 61, 43)",
+    "--yellow": "rgb(255, 212, 56)",
+    "--muted": "rgb(119, 113, 100)"
+  },
+  "literal_colours_outside_root": {
+    "#ece5d2": ".game-shell background — rgb(236, 229, 210)",
+    "#1976d2": ".board button:focus-visible outline",
+    "rgba(237,61,43,.14)": ".house-status span box-shadow (dead rule)"
+  }
+}

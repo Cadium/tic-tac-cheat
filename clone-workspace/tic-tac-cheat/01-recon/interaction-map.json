@@ -1,0 +1,20 @@
+{
+  "states_exercised": [
+    { "state": "initial / your turn", "how": "load", "notes": "status 'Your move, hotshot.', turn-pill YOUR TURN (yellow dot), score 0-0, incident log empty ('Nothing suspicious yet.')" },
+    { "state": "player mark placed", "how": "click empty cell", "notes": "cell gets .x + .ai-move animation (bg flashes --red), status 'Let me think…', turn-pill HOUSE TURN (red dot), 450-700ms delay" },
+    { "state": "house legal opening", "how": "first move of match", "notes": "one O placed, no incident. planTurn turn===1 branch." },
+    { "state": "cheat: erase", "how": "any later turn, 'erase' strategy", "notes": "a random X removed with .cheated animation (bg flashes --ink twice); incident logged e.g. 'That square was never included in the free plan.'" },
+    { "state": "cheat: double", "how": "any later turn, 'double' strategy", "notes": "House places O, cue 'Your turn.', 850ms, then a SECOND O with incident 'Buy one, get one free.'" },
+    { "state": "cheat: offside", "how": "player completes a line", "notes": "line never renders as a win; X on the line erased atomically with incident 'Three in a row? One of those Xs was offside.'; extra Xs stripped with 'And that one. The referee is very thorough.'" },
+    { "state": "cheat: eviction", "how": "board full when House wants a seat", "notes": "an X removed with 'We need this seat.'" },
+    { "state": "cheat: no-draw", "how": "board fills with no O line", "notes": "an X removed with 'A draw? We have reopened your application.'" },
+    { "state": "house win", "how": "House completes an O line", "notes": "winning cells get .winner (bg --yellow), score house++, status a smug line, toast 'The House wins. What are the odds?', turn-pill hidden, board disabled" },
+    { "state": "appeal", "how": "click FILE AN APPEAL", "notes": "house score ++, incident 'Appeal denied. A processing fee of one point was awarded to the House.', toast 'APPEAL DENIED · HOUSE +1'" },
+    { "state": "new game", "how": "click START ANOTHER RIGGED GAME", "notes": "board cleared, match number ++ (zero-padded 3), incidents reset, generation++ cancels any in-flight House turn" },
+    { "state": "cell hover (empty)", "how": "hover", "notes": "background --yellow" },
+    { "state": "cell focus", "how": "keyboard focus", "notes": "outline 5px solid #1976d2, offset -6px, z-index 1" },
+    { "state": "new-game / appeal hover", "how": "hover", "notes": "new-game -> bg --yellow ink text; appeal -> bg --red paper text" }
+  ],
+  "viewports_checked": ["desktop", "tablet 768", "mobile 375"],
+  "screenshots": "Browser pane runs headless/hidden in this environment (0x0 viewport), so pixel screenshots are unreliable; computed styles + verbatim authored CSS are the ground truth per 00-config.json. Visual parity confirmed by side-by-side against the live site in QA."
+}

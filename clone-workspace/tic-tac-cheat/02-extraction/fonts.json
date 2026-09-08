@@ -1,0 +1,21 @@
+{
+  "source": "Google Fonts, hotlinked via @import in styles.css (line 1)",
+  "families": [
+    { "family": "Space Grotesk", "weights": [500, 600, 700], "usage": "display / headings / board marks / scores", "note": "served as a weight-subset static woff2; latin + latin-ext + vietnamese slices" },
+    { "family": "DM Mono", "weights": [400, 500], "usage": "all monospace UI text — labels, status pill, incident log, fine print, footer, toast" }
+  ],
+  "self_hosted": {
+    "dir": "assets/fonts/",
+    "files": [
+      "space-grotesk-latin.woff2", "space-grotesk-latin-ext.woff2",
+      "dm-mono-400-latin.woff2", "dm-mono-400-latin-ext.woff2",
+      "dm-mono-500-latin.woff2", "dm-mono-500-latin-ext.woff2"
+    ],
+    "face_css": "assets/fonts.css",
+    "rationale": "methodology requires real font files, not a hotlink; also removes a third-party request and works offline"
+  },
+  "fallbacks": {
+    "Space Grotesk": "\"Space Grotesk\", \"Arial Narrow\", Arial, sans-serif",
+    "DM Mono": "\"DM Mono\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace"
+  }
+}

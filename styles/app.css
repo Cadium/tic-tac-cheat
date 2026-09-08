@@ -1,0 +1,342 @@
+/* app.css — layout + components. Consumes tokens.css only.
+   Faithful reconstruction of the target's authored stylesheet: dead rules
+   (.ticker / .masthead / .house-status) dropped, the two untokenised literals
+   (#ece5d2, #1976d2) replaced with --shell / --focus, font stacks widened. */
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); }
+button, a { color: inherit; font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+
+/* ---------- frame ---------- */
+main {
+  max-width: var(--frame-max);
+  margin: auto;
+  border-inline: var(--rule);
+}
+
+/* ---------- intro ---------- */
+.intro {
+  position: relative;
+  min-height: 370px;
+  padding: clamp(2.4rem, 5vw, 5rem) 5vw 2.5rem;
+  overflow: hidden;
+  border-bottom: var(--rule);
+}
+.intro::after {
+  position: absolute;
+  content: "O";
+  right: 3vw;
+  top: 50%;
+  color: var(--yellow);
+  font-size: var(--t-ghost);
+  font-weight: 700;
+  line-height: 0.5;
+  letter-spacing: -0.12em;
+  transform: translateY(-48%) rotate(6deg);
+  z-index: -1;
+}
+.label {
+  margin: 0;
+  font: 500 var(--t-label) / 1 var(--font-mono);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+h1 {
+  margin: 1.15rem 0 0;
+  max-width: 900px;
+  font-size: var(--t-hero);
+  line-height: 0.76;
+  letter-spacing: -0.09em;
+}
+h1 span { color: var(--red); }
+.lede {
+  max-width: 330px;
+  margin: 1.5rem 0 0 auto;
+  font: 500 var(--t-lede) / 1.45 var(--font-mono);
+}
+
+/* ---------- game shell ---------- */
+.game-shell { background: var(--shell); }
+.game-topline {
+  min-height: 118px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1.8rem 5vw;
+  border-bottom: var(--rule);
+}
+.topline-main { min-width: 0; }
+.status {
+  margin: 0.65rem 0 0;
+  font-size: var(--t-status);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+.topline-aside { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+
+.turn-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 145px;
+  padding: 0.8rem 1rem;
+  color: var(--paper);
+  background: var(--ink);
+  font: 500 var(--t-label) / 1 var(--font-mono);
+}
+.turn-pill > span:first-child {
+  width: var(--dot);
+  height: var(--dot);
+  background: var(--yellow);
+  border-radius: 50%;
+}
+.turn-pill.ai > span:first-child { background: var(--red); }
+
+/* topline toggle button (Referee Cam) */
+.ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  background: transparent;
+  border: var(--rule);
+  font: 500 var(--t-label) / 1 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.ghost-btn[aria-pressed="true"] { color: var(--paper); background: var(--ink); }
+.ghost-btn:hover { color: var(--ink); background: var(--yellow); }
+.ghost-btn[aria-pressed="true"]:hover { color: var(--ink); background: var(--yellow); }
+
+/* ---------- grid ---------- */
+.game-grid { display: grid; grid-template-columns: minmax(440px, 1.25fr) minmax(320px, 0.75fr); }
+.game-grid > div { padding: clamp(2rem, 5vw, 5rem); border-right: var(--rule); }
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  max-width: var(--board-max);
+  aspect-ratio: 1;
+  container-type: inline-size;
+  margin: auto;
+  background: var(--ink);
+  gap: 2px;
+  border: var(--rule);
+  box-shadow: var(--shadow-hard);
+}
+.board button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+  background: var(--paper);
+  border: 0;
+  cursor: pointer;
+}
+.board button:hover:empty { background: var(--yellow); }
+.board button:focus-visible { z-index: 1; outline: 5px solid var(--focus); outline-offset: -6px; }
+.board button:disabled { cursor: default; opacity: 1; }
+.board button::before {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 22cqw;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.1em;
+}
+.board button.x::before { content: "\00d7"; color: var(--ink); }
+.board button.o::before { content: "\25cb"; color: var(--red); }
+.board button.cheated { animation: stolen var(--dur-steal) ease both; }
+.board button.ai-move { animation: stamped var(--dur-stamp) var(--ease-stamp) both; }
+.board button.winner { background: var(--yellow); }
+.board.near-miss { animation: near-miss var(--dur-nearmiss) ease both; }
+.board button.stolen-stamp::after {
+  content: "STOLEN";
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 2px 0;
+  font: 500 0.5rem / 1 var(--font-mono);
+  text-align: center;
+  color: var(--paper);
+  background: var(--red);
+}
+
+@keyframes stamped { from { background: var(--red); } }
+@keyframes stolen { 20%, 46% { background: var(--ink); } }
+@keyframes near-miss {
+  0% { box-shadow: var(--shadow-hard); }
+  15%, 55% { background: var(--yellow); transform: translate(-2px, 0); }
+  35% { transform: translate(3px, 0); }
+  100% { box-shadow: var(--shadow-hard); }
+}
+
+.new-game {
+  width: 100%;
+  max-width: var(--board-max);
+  display: flex;
+  justify-content: space-between;
+  margin: 2.3rem auto 0;
+  padding: 1rem 1.1rem;
+  color: var(--paper);
+  background: var(--ink);
+  border: var(--rule);
+  font: 500 var(--t-btn) / 1 var(--font-mono);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+.new-game:hover { color: var(--ink); background: var(--yellow); }
+.new-game span { font-size: 1.1rem; }
+
+/* ---------- scorecard ---------- */
+.scorecard { min-width: 0; padding: clamp(2rem, 4vw, 4rem); background: var(--paper); }
+.score-head, .log-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: var(--rule);
+}
+.score-head > span, .log-head > span { color: var(--muted); font: 400 var(--t-meta) / 1 var(--font-mono); }
+.scores { display: grid; grid-template-columns: 1fr 1fr; border-bottom: var(--rule); }
+.scores > div { display: flex; min-width: 0; flex-direction: column; padding: 1.3rem 1rem 1rem 0; }
+.scores > div + div { padding-left: 1.4rem; border-left: var(--rule); }
+.scores span { font: 500 0.64rem / 1 var(--font-mono); }
+.scores strong {
+  margin-top: 0.4rem;
+  font-size: var(--t-score);
+  line-height: 1;
+  letter-spacing: -0.09em;
+}
+.house-score strong { color: var(--red); }
+.fine-print { padding: 0.75rem 0 2.8rem; color: var(--muted); font: 400 var(--t-fine) / 1.4 var(--font-mono); }
+
+.incident-log {
+  min-height: 210px;
+  max-height: 310px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  border-bottom: var(--hair);
+}
+.incident-log li {
+  position: relative;
+  padding: 1rem 0 1rem 2.2rem;
+  border-bottom: var(--hair);
+  font: 500 var(--t-log) / 1.4 var(--font-mono);
+  color: var(--muted);
+}
+.incident-log li::before {
+  position: absolute;
+  left: 0;
+  top: 0.85rem;
+  content: attr(data-number);
+  display: grid;
+  width: var(--badge);
+  height: var(--badge);
+  place-items: center;
+  color: var(--paper);
+  background: var(--red);
+  font-size: 0.56rem;
+  border-radius: 50%;
+}
+.incident-log li .statute {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--ink);
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+}
+.incident-log li.rewritten { color: var(--red); }
+.incident-log .empty-log { padding: 2.5rem 0; color: var(--muted); text-align: center; }
+.incident-log .empty-log::before { display: none; }
+.empty-log span { font-size: 0.6rem; }
+
+.appeal {
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.9rem;
+  background: transparent;
+  border: var(--rule);
+  font: 500 var(--t-appeal) / 1 var(--font-mono);
+  cursor: pointer;
+}
+.appeal:hover { color: var(--paper); background: var(--red); }
+.appeal:disabled { color: var(--muted); border-color: var(--line); cursor: not-allowed; }
+.appeal:disabled:hover { background: transparent; color: var(--muted); }
+
+/* ---------- footer ---------- */
+footer {
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  max-width: var(--frame-max);
+  margin: auto;
+  padding: 1.5rem 3vw;
+  color: var(--paper);
+  background: var(--ink);
+  font: 400 var(--t-foot) / 1.4 var(--font-mono);
+}
+footer p { margin: 0; }
+
+/* ---------- toast ---------- */
+.toast {
+  position: fixed;
+  right: 1.3rem;
+  bottom: 1.3rem;
+  max-width: min(360px, calc(100vw - 2.6rem));
+  padding: 1rem 1.2rem;
+  color: var(--paper);
+  background: var(--red);
+  border: var(--rule);
+  box-shadow: var(--shadow-toast);
+  font: 500 var(--t-toast) / 1.45 var(--font-mono);
+  transform: translateY(160%);
+  transition: transform var(--dur-toast) ease;
+  z-index: 10;
+}
+.toast.show { transform: translateY(0); }
+
+/* ---------- responsive (target breakpoints) ---------- */
+@media (max-width: 850px) {
+  .intro { min-height: 320px; }
+  .game-grid { grid-template-columns: 1fr; }
+  .game-grid > div { border-right: 0; border-bottom: var(--rule); }
+  .scorecard { min-height: 560px; }
+}
+@media (max-width: 560px) {
+  .intro { min-height: 275px; padding: 2.3rem 1.2rem 1.6rem; }
+  .intro::after { right: -10vw; }
+  .lede { margin-left: 0; }
+  .game-topline { min-height: 125px; align-items: flex-start; flex-direction: column; gap: 1.2rem; padding: 1.5rem 1.2rem; }
+  .game-grid > div, .scorecard { padding: 1.5rem 1.2rem; }
+  .board { box-shadow: var(--shadow-hard-sm); }
+  @keyframes near-miss {
+    0%, 100% { box-shadow: var(--shadow-hard-sm); }
+    15%, 55% { background: var(--yellow); }
+  }
+  footer { align-items: flex-start; flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

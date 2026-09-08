@@ -1,0 +1,19 @@
+{
+  "name": "tic-tac-cheat",
+  "target_url": "https://tic-tac-toe-ai-62a.pages.dev/",
+  "captured": "2026-09-08",
+  "method": "clone-app-pat-pro (github.com/per-simmons/clone-app-pat-pro-public)",
+  "note": "Target is 4 static files served verbatim (no build, no minification). Full source was recoverable byte-for-byte, so the authoritative source order here is: authored CSS/JS (verbatim) > confirmed computed colour resolutions > screenshots. The reconstructed shell reuses the target's own authored values; assertions.json checks the rebuild's computed styles against them.",
+  "viewports": { "desktop": "1280x800", "tablet": "768x1024", "mobile": "375x812" },
+  "pages": ["/"],
+  "stack": {
+    "framework": "none — vanilla ES modules",
+    "build": "none",
+    "css": "single hand-authored stylesheet, CSS custom properties, container queries, clamp() type ramp",
+    "fonts": "Google Fonts (Space Grotesk 500/600/700, DM Mono 400/500) — hotlinked in target, self-hosted woff2 in rebuild",
+    "themes": ["light only"],
+    "breakpoints": [850, 560],
+    "a11y": "role=grid/gridcell, aria-live regions, prefers-reduced-motion handled"
+  },
+  "gate": { "style_assertion_failures": 0, "build_compiles": true }
+}

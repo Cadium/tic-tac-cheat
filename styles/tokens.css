@@ -1,0 +1,67 @@
+/* tokens.css — the single source of truth. See clone-workspace/.../03-design-spec/DESIGN.md.
+   Nothing else declares a custom property. Components consume var(--token) only. */
+
+:root {
+  /* Colour */
+  --ink: #121212;
+  --paper: #f4efdf;
+  --shell: #ece5d2;
+  --red: #ed3d2b;
+  --yellow: #ffd438;
+  --muted: #777164;
+  --line: rgba(18, 18, 18, 0.22);
+  --focus: #1976d2;
+
+  /* Type families */
+  --font-display: "Space Grotesk", "Arial Narrow", Arial, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Type ramp (verbatim clamp() expressions from the target) */
+  --t-hero: clamp(4rem, 10vw, 9.5rem);
+  --t-ghost: clamp(19rem, 38vw, 36rem);
+  --t-status: clamp(1.25rem, 2.5vw, 2.2rem);
+  --t-score: clamp(4rem, 8vw, 7rem);
+  --t-lede: clamp(0.9rem, 1.6vw, 1.12rem);
+  --t-label: 0.66rem;
+  --t-btn: 0.73rem;
+  --t-appeal: 0.67rem;
+  --t-log: 0.72rem;
+  --t-meta: 0.6rem;
+  --t-fine: 0.56rem;
+  --t-foot: 0.58rem;
+  --t-toast: 0.7rem;
+
+  /* Structure */
+  --rule: 2px solid var(--ink);
+  --hair: 1px solid var(--line);
+  --dot: 8px;
+  --badge: 24px;
+  --frame-max: 1440px;
+  --board-max: 650px;
+
+  /* Spacing scale (new UI) */
+  --s-1: 0.4rem;
+  --s-2: 0.65rem;
+  --s-3: 1rem;
+  --s-4: 1.3rem;
+  --s-5: 1.8rem;
+  --s-6: 2.3rem;
+
+  /* Shadow */
+  --shadow-hard: 13px 13px 0 var(--red);
+  --shadow-hard-sm: 7px 7px 0 var(--red);
+  --shadow-toast: 6px 6px 0 var(--ink);
+
+  /* Motion */
+  --ease-stamp: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-stamp: 0.4s;
+  --dur-steal: 0.55s;
+  --dur-toast: 0.25s;
+  --dur-nearmiss: 0.7s;
+
+  font-family: var(--font-display);
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+  color-scheme: light;
+}

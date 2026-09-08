@@ -1,0 +1,15 @@
+{
+  "cycle": 0,
+  "stage": "phase-0 reconstruction",
+  "gate": {
+    "style_assertions": { "checks": 106, "failures": 0, "status": "PASS" },
+    "runtime_errors": 0,
+    "plays_like_original": true
+  },
+  "visual_check": "Side-by-side vs https://tic-tac-toe-ai-62a.pages.dev/ — masthead, type ramp, status line, turn pill, scorecard, board + hard red shadow all match. The only visible difference is the added Referee Cam toggle in the topline (intended).",
+  "notes": [
+    "Browser pane renders at 0x0 in this environment, so clamp()-driven sizes could not be pixel-measured live; they are carried verbatim from the target's authored CSS and excluded from the numeric gate.",
+    "Fonts self-hosted (woff2) instead of the target's Google Fonts hotlink.",
+    "Dead rules (.ticker/.masthead/.house-status) dropped; #ece5d2 -> --shell, #1976d2 -> --focus."
+  ]
+}
