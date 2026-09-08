@@ -81,7 +81,13 @@ export function planTurn(input, ctx) {
       if (!open.length) return; // nothing left to do; termination guard below handles it
     }
     const wins = open.filter(i => { const b = [...board]; b[i] = 'O'; return winner(b, 'O'); });
-    commit([[pick(rng, wins.length ? wins : open), 'O']], {});
+    // At tiers 3+ the House shows off: for the first couple of turns it holds
+    // back the winning move so its renovations / rebranding / capture get screen
+    // time. (Termination is unaffected — it just adds a turn or two.)
+    const showboat = tier >= 3 && turn <= 3 && open.length > 3 && rng() < 0.7;
+    const nonWinning = open.filter(i => !wins.includes(i));
+    const pool = showboat && nonWinning.length ? nonWinning : wins.length ? wins : open;
+    commit([[pick(rng, pool), 'O']], {});
   };
 
   // Audit: the House is frozen. It places nothing and cheats nothing.
@@ -199,7 +205,9 @@ function tierKind(tier, previous, rng) {
     const opts = ['erase', 'double'].filter(k => k !== previous);
     return pick(rng, opts.length ? opts : ['erase', 'double']);
   }
-  // Higher tiers lead with their signature ~60% of the time, else a lower cheat.
+  // Higher tiers: guarantee the signature cheat gets shown at least once, early.
+  if (previous === '' || previous === 'legal') return sig;
+  // then lead with the signature ~60% of the time, else a lower cheat.
   if (rng() < 0.6) return sig;
   const lower = ['erase', 'double', 'condemn', 'rebrand'].slice(0, tier - 1).filter(k => k !== previous);
   return pick(rng, lower.length ? lower : [sig]);

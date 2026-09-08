@@ -1,15 +1,16 @@
 {
-  "cycle": 0,
-  "stage": "phase-0 reconstruction",
+  "cycle": 1,
+  "stage": "phase-2 core UI on the v2 engine",
   "gate": {
     "style_assertions": { "checks": 106, "failures": 0, "status": "PASS" },
-    "runtime_errors": 0,
-    "plays_like_original": true
+    "engine_tests": { "total": 13, "pass": 13, "invariant_runs": 5000 },
+    "runtime_errors": 0
   },
-  "visual_check": "Side-by-side vs https://tic-tac-toe-ai-62a.pages.dev/ — masthead, type ramp, status line, turn pill, scorecard, board + hard red shadow all match. The only visible difference is the added Referee Cam toggle in the topline (intended).",
-  "notes": [
-    "Browser pane renders at 0x0 in this environment, so clamp()-driven sizes could not be pixel-measured live; they are carried verbatim from the target's authored CSS and excluded from the numeric gate.",
-    "Fonts self-hosted (woff2) instead of the target's Google Fonts hotlink.",
-    "Dead rules (.ticker/.masthead/.house-status) dropped; #ece5d2 -> --shell, #1976d2 -> --focus."
-  ]
+  "observed": {
+    "near_miss_steal": "fires: chime + held yellow flash, then whistle + stolen animation + offside incident",
+    "escalation": "tier 5 match produced condemnation (§3.2), regulatory capture + gaslighting (§11 x2), mark validity (§4.0), promotional play (§2.4) — 5 violations over 4 turns",
+    "referee_cam": "toggles statute rail on every incident row, persists across reload",
+    "house_voice": "status line varies by composure band"
+  },
+  "visual_check": "Shell still matches the live original; Referee Cam toggle shows its active (ink-fill) state when on."
 }

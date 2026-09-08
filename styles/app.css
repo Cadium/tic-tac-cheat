@@ -160,6 +160,22 @@ h1 span { color: var(--red); }
 .board button.cheated { animation: stolen var(--dur-steal) ease both; }
 .board button.ai-move { animation: stamped var(--dur-stamp) var(--ease-stamp) both; }
 .board button.winner { background: var(--yellow); }
+.board button.so-close { background: var(--yellow); }
+.board button.condemned {
+  cursor: not-allowed;
+  background: repeating-linear-gradient(45deg, var(--paper) 0 8px, color-mix(in srgb, var(--ink) 14%, var(--paper)) 8px 16px);
+}
+.board button.condemned::after {
+  content: "CONDEMNED";
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 2px 0;
+  font: 500 0.42rem / 1 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-align: center;
+  color: var(--paper);
+  background: var(--ink);
+}
 .board.near-miss { animation: near-miss var(--dur-nearmiss) ease both; }
 .board button.stolen-stamp::after {
   content: "STOLEN";

@@ -75,6 +75,10 @@ function simulateMatch(seed, matchNumber, playerMode) {
 
       assert.ok(!winner(board, 'X'),
         `seed ${seed} match ${matchNumber}: player is holding a line after the House replied\n${board}`);
+      for (const i of condemned) {
+        assert.equal(board[i], null,
+          `seed ${seed} match ${matchNumber}: condemned cell ${i} is holding "${board[i]}"`);
+      }
     }
 
     if (winner(board, 'O')) return { turns: turn, board }; // House won — expected
