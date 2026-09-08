@@ -65,4 +65,25 @@ export function setRefereeCam(on) {
   listEl?.querySelectorAll('.statute').forEach(s => { s.hidden = !cam; });
 }
 
+/** Counter-measure undo: drop the newest rows back to a prior count. */
+export function truncateIncidentsTo(count) {
+  const rows = [...listEl.querySelectorAll('li:not(.empty-log)')]; // newest first
+  const toRemove = Math.max(0, rows.length - count);
+  for (let i = 0; i < toRemove; i++) rows[i].remove();
+  n = Math.max(0, count);
+  if (countEl) countEl.textContent = n ? `${n} violation${n === 1 ? '' : 's'}` : '0 violations';
+  if (!n) resetIncidentLog();
+}
+
+/** Tag the most recent incident (e.g. LEAKED, VOID). */
+export function tagLastIncident(label, cls = 'tagged') {
+  const li = listEl.querySelector('li:not(.empty-log)');
+  if (!li || li.querySelector('.incident-tag')) return;
+  const tag = document.createElement('span');
+  tag.className = 'incident-tag ' + cls;
+  tag.textContent = label;
+  li.querySelector('.incident-text')?.after(tag);
+  li.classList.add('has-tag');
+}
+
 export const incidentCount = () => n;

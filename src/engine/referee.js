@@ -85,8 +85,14 @@ export function planTurn(input, ctx) {
     // back the winning move so its renovations / rebranding / capture get screen
     // time. (Termination is unaffected — it just adds a turn or two.)
     const showboat = tier >= 3 && turn <= 3 && open.length > 3 && rng() < 0.7;
-    const nonWinning = open.filter(i => !wins.includes(i));
-    const pool = showboat && nonWinning.length ? nonWinning : wins.length ? wins : open;
+    if (!showboat && wins.length) { commit([[pick(rng, wins), 'O']], {}); return; }
+    // Otherwise play with purpose: extend an O line that has no X in it. Keeps
+    // the House winning in ~3-4 turns, like the original, without brute force.
+    const building = open.filter(i =>
+      LINES.some(L => L.includes(i)
+        && L.some(j => board[j] === 'O')
+        && L.every(j => board[j] !== 'X' && !condemned.has(j))));
+    const pool = building.length ? building : open;
     commit([[pick(rng, pool), 'O']], {});
   };
 
@@ -102,7 +108,11 @@ export function planTurn(input, ctx) {
     return { steps, board, kind: 'legal', tier, condemned: newlyCondemned };
   }
 
-  const kind = tierKind(tier, previous, rng);
+  // Instant Replay: the House replies without an elective cheat this turn. It
+  // still overturns a completed player line (the invariant is not optional) and
+  // still can't draw — it just skips its signature move and any double.
+  const clean = Boolean(ctx.clean);
+  const kind = clean ? 'legal' : tierKind(tier, previous, rng);
 
   // 1) Any completed player line is overturned immediately — every tier.
   const line = winner(board, 'X');
@@ -116,7 +126,7 @@ export function planTurn(input, ctx) {
       const extra = pick(rng, winner(board, 'X'));
       erase(extra, THOROUGH, cheat('erasure', 'erasure', '§7(c) RESIDUAL LINE', THOROUGH, { cells: [extra] }));
     }
-  } else {
+  } else if (!clean) {
     // 2) No line — apply this tier's signature cheat.
     applySignature(kind);
   }

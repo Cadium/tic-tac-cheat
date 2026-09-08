@@ -1,36 +1,41 @@
-// Match loop, on the v2 engine. Phase 2 wires a single escalating match with the
-// near-miss steal, the House voice, the incident log, and Referee Cam. The run
-// economy (composure meter, counter-measures, the tribunal) lands in later
-// phases — the evidence bank is already accumulating for them.
+// Match loop + the run economy. The engine decides how the House cheats; this
+// file runs the loop, files the evidence, and lets you spend it fighting back.
+// The tribunal, intermission screen, and global counter arrive in later phases.
 
-import { emptyBoard, winner, openSquares, makeRng } from './engine/board.js';
+import { emptyBoard, winner, makeRng } from './engine/board.js';
 import { planTurn } from './engine/referee.js';
-import { tierForMatch } from './engine/tiers.js';
-import { makeComposure } from './engine/composure.js';
-import { makeEvidenceBank, record as recordEvidence, canPressCharges } from './engine/evidence.js';
+import { TIERS } from './engine/tiers.js';
+import { distinctClasses } from './engine/evidence.js';
+import { makeRun } from './meta/run.js';
+import { loadPrefs, savePrefs, loadRun, saveRun } from './meta/persistence.js';
+import { canUse, commitUse } from './meta/countermeasures.js';
 import { mountBoard, renderBoard, nearMissSteal } from './ui/boardView.js';
-import { mountIncidentLog, resetIncidentLog, reportIncident, rewriteLastIncident, setRefereeCam } from './ui/incidentLog.js';
+import {
+  mountIncidentLog, resetIncidentLog, reportIncident, rewriteLastIncident,
+  setRefereeCam, incidentCount, truncateIncidentsTo, tagLastIncident,
+} from './ui/incidentLog.js';
 import { mountToast, showToast, hideToast } from './ui/toast.js';
 import { houseVoice } from './ui/houseVoice.js';
 import { sfx, setSoundEnabled } from './ui/sound.js';
+import { mountComposureMeter, renderComposure } from './ui/composureMeter.js';
+import { mountEvidenceTally, renderEvidenceTally } from './ui/evidenceTally.js';
+import { mountCountermeasureBar, renderCountermeasureBar } from './ui/countermeasureBar.js';
 
 const $ = s => document.querySelector(s);
 const wait = ms => new Promise(r => setTimeout(r, ms));
+const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+const shortDelay = ms => (reduced() ? Math.min(ms, 80) : ms);
 
-// ---- persisted preferences (formalised in meta/persistence.js in Phase 3) ----
-const PREF = 'ttc:prefs';
-const prefs = load(PREF, { refereeCam: false, sound: false });
-function load(k, fallback) {
-  try { return { ...fallback, ...JSON.parse(localStorage.getItem(k) || '{}') }; } catch { return { ...fallback }; }
-}
-function savePrefs() {
-  try { localStorage.setItem(PREF, JSON.stringify(prefs)); } catch { /* private mode */ }
-}
+const KIND_LABEL = {
+  legal: 'an ordinary move', erase: 'an erasure', double: 'double-dealing',
+  condemn: 'a condemnation', rebrand: 'a reclassification', capture: 'regulatory capture',
+  audited: 'nothing at all',
+};
 
-// ---- session state ----------------------------------------------------------
+// ---- state ---------------------------------------------------------------
+const prefs = loadPrefs();
+const run = makeRun(loadRun());
 const rng = makeRng((Date.now() ^ 0x9e3779b9) >>> 0);
-const composure = makeComposure();
-const evidence = makeEvidenceBank();
 
 let board = emptyBoard();
 let condemned = new Set();
@@ -39,13 +44,25 @@ let previous = '';
 let busy = false;
 let done = false;
 let generation = 0;
-let matchNumber = 1;
-let houseWins = 0;
 let incidentsThisMatch = 0;
 let appealDisabled = false;
 
-// ---- render helpers --------------------------------------------------------
-function status(text) { $('#status').textContent = text; }
+let snapPreMove = null;   // for INSTANT REPLAY
+let snapPostMove = null;  // for FREEZE FRAME
+let houseActed = false;   // was the last House turn a real move (not audited / already undone)?
+let subpoenaCharges = 0;
+let auditNext = false;
+let cleanNextReply = false;
+
+// ---- persistence --------------------------------------------------------
+let saveTimer;
+function persist() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { saveRun(run.serialize()); savePrefs(prefs); }, 250);
+}
+
+// ---- rendering ---------------------------------------------------------
+const status = text => { $('#status').textContent = text; };
 
 function setTurnPill(label, ai = false) {
   $('#turn-label').textContent = label;
@@ -62,18 +79,45 @@ function paint(changed = [], cheat = false) {
   });
 }
 
-// ---- the loop -------------------------------------------------------------
+function canUndoNow() {
+  return !busy && !done && houseActed && snapPostMove != null;
+}
+
+function refreshMeta() {
+  renderComposure(run.composure);
+  renderEvidenceTally(run.evidence);
+  renderCountermeasureBar(run, {
+    canUndo: canUndoNow(),
+    hasExhibits: distinctClasses(run.evidence) > 0,
+  });
+  $('#press-charges').hidden = !run.canPressCharges;
+  $('#match-number').textContent = String(run.match).padStart(3, '0');
+  $('#ai-score').textContent = String(run.houseScore);
+}
+
+// ---- the loop --------------------------------------------------------
+function snapshot() {
+  return {
+    board: [...board], turn, previous,
+    condemned: new Set(condemned),
+    incidentN: incidentCount(),
+    evLen: run.evidence.log.length,
+  };
+}
+
 async function play(index) {
   if (busy || done || board[index] != null || condemned.has(index)) return;
   busy = true;
   const round = generation;
 
+  snapPreMove = snapshot();
   board[index] = 'X';
   sfx('tap');
   paint([index], false);
+  snapPostMove = snapshot();
 
   const threatened = Boolean(winner(board, 'X'));
-  const band = composure.band().id;
+  const band = run.composure.band().id;
 
   if (threatened) {
     status('THREE IN A ROW —');
@@ -81,12 +125,27 @@ async function play(index) {
     await nearMissSteal(winner(board, 'X'));
     if (round !== generation) return;
     sfx('whistle');
-    composure.nudge(-6);
+    run.composure.nudge(-6);
+    status(houseVoice.nearMiss(run.composure.band().id));
   }
 
-  const tier = tierForMatch(matchNumber, composure.band().id);
-  const plan = planTurn(board, { turn: ++turn, previous, rng, tier, condemned });
-  for (const c of plan.condemned) condemned.add(c); // reflect condemnations as they animate
+  const tier = run.tier;
+  const plan = planTurn(board, {
+    turn: ++turn, previous, rng, tier,
+    condemned, audited: auditNext, clean: cleanNextReply,
+  });
+  const wasAudited = auditNext;
+  auditNext = false;
+  cleanNextReply = false;
+  for (const c of plan.condemned) condemned.add(c);
+
+  if (subpoenaCharges > 0) {
+    subpoenaCharges -= 1;
+    status(`THE HOUSE DECLARES: ${KIND_LABEL[plan.kind] ?? plan.kind}. (${TIERS[tier].name})`);
+    sfx('stamp');
+    await wait(shortDelay(1100));
+    if (round !== generation) return;
+  }
 
   if (threatened) {
     const correction = plan.steps.shift();
@@ -98,7 +157,7 @@ async function play(index) {
   }
 
   setTurnPill('HOUSE TURN', true);
-  await wait(threatened ? 250 : 450 + rng() * 250);
+  await wait(shortDelay(threatened ? 250 : 450 + rng() * 250));
   if (round !== generation) return;
 
   for (const step of plan.steps) {
@@ -112,25 +171,29 @@ async function play(index) {
       else if (step.cue) status(step.cue);
       if (step.changed.length) sfx('stamp');
     }
-    await wait(reducedDelay(step.delay));
+    await wait(shortDelay(step.delay));
     if (round !== generation) return;
   }
 
   previous = plan.kind;
   busy = false;
+  houseActed = !wasAudited && plan.kind !== 'audited';
 
-  if (winner(board, 'O')) endMatch();
-  else {
-    status(houseVoice.yourMove(composure.band().id, turn));
+  if (winner(board, 'O')) {
+    endMatch();
+  } else {
+    status(houseVoice.yourMove(run.composure.band().id, turn));
     setTurnPill('YOUR TURN');
     paint();
+    refreshMeta();
   }
+  persist();
 }
 
 function applyCheatStep(step) {
   const ev = step.cheatEvent;
   paint(step.changed, true);
-  incidentsThisMatch++;
+  incidentsThisMatch += 1;
 
   if (ev.type === 'obstruction') {
     if (ev.act === 'disableAppeal') { appealDisabled = true; $('#appeal').disabled = true; }
@@ -138,33 +201,26 @@ function applyCheatStep(step) {
   }
 
   reportIncident(step.message, { statute: ev.statute, turn: ev.turn ?? turn });
-  recordEvidence(evidence, { ...ev, turn });
+  run.bankViolation({ ...ev, turn });
   status(step.message);
-
-  // Press Charges availability is surfaced fully in Phase 4; keep the hook live.
-  if (canPressCharges(evidence)) $('#press-charges').hidden = false;
-}
-
-function reducedDelay(ms) {
-  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  return reduced ? Math.min(ms, 80) : ms;
+  refreshMeta();
 }
 
 function endMatch() {
   done = true;
-  houseWins++;
-  $('#ai-score').textContent = String(houseWins);
-  if (incidentsThisMatch === 0) composure.nudge(3); // a clean win emboldens it
-  status(houseVoice.won(composure.band().id, incidentsThisMatch > 0));
+  run.loseMatch({ clean: incidentsThisMatch === 0 });
+  status(houseVoice.won(run.composure.band().id, incidentsThisMatch > 0));
   setTurnPill('');
   showToast('The House wins. What are the odds?');
   sfx('buzzer');
   paint();
+  refreshMeta();
+  persist();
 }
 
 function newMatch() {
-  generation++;
-  matchNumber++;
+  generation += 1;
+  run.advanceMatch();
   board = emptyBoard();
   condemned = new Set();
   turn = 0;
@@ -173,34 +229,106 @@ function newMatch() {
   done = false;
   incidentsThisMatch = 0;
   appealDisabled = false;
+  snapPreMove = snapPostMove = null;
+  houseActed = false;
+  subpoenaCharges = 0;
+  auditNext = false;
+  cleanNextReply = false;
   $('#appeal').disabled = false;
-  $('#match-number').textContent = String(matchNumber).padStart(3, '0');
   resetIncidentLog();
   hideToast();
-  status('Your move, hotshot.');
+  status(`Match ${String(run.match).padStart(3, '0')}. ${TIERS[run.tier].blurb}`);
   setTurnPill('YOUR TURN');
   paint();
+  refreshMeta();
+  persist();
 }
 
-// ---- wiring --------------------------------------------------------------
+// ---- counter-measures --------------------------------------------------
+function useCountermeasure(id) {
+  if (busy) return;
+  const context = { canUndo: canUndoNow(), hasExhibits: distinctClasses(run.evidence) > 0 };
+  if (!canUse(run, id, context)) return;
+  commitUse(run, id);
+
+  if (id === 'subpoena') {
+    subpoenaCharges = 2;
+    showToast('SUBPOENA SERVED · the House must declare its next two moves');
+  } else if (id === 'audit') {
+    auditNext = true;
+    showToast('AUDIT SCHEDULED · the House sits out its next turn');
+  } else if (id === 'freeze') {
+    restore(snapPostMove);
+    cleanNextReply = false;
+    houseActed = false;
+    snapPostMove = null;
+    status('The House’s last turn has been struck from the record.');
+    showToast('FREEZE FRAME · the House does not get to retake it');
+  } else if (id === 'replay') {
+    restore(snapPreMove);
+    cleanNextReply = true;
+    houseActed = false;
+    snapPreMove = snapPostMove = null;
+    status('Rewound. Play it again — the House replies clean this time.');
+    showToast('INSTANT REPLAY');
+  } else if (id === 'whistle') {
+    const last = run.evidence.log[run.evidence.log.length - 1];
+    if (last) {
+      run.corroborateExhibit(last.class);
+      tagLastIncident('LEAKED', 'leaked');
+    }
+    run.composure.lowerFloor(8);
+    run.composure.nudge(-8);
+    showToast('LEAKED TO THE PRESS · that exhibit counts double at trial');
+  }
+
+  sfx('gavel');
+  setTurnPill('YOUR TURN');
+  paint();
+  refreshMeta();
+  persist();
+}
+
+function restore(snap) {
+  if (!snap) return;
+  const strikeFrom = snap.incidentN;
+  board = [...snap.board];
+  turn = snap.turn;
+  previous = snap.previous;
+  condemned = new Set(snap.condemned);
+  truncateIncidentsTo(strikeFrom);
+  run.rollbackEvidence(snap.evLen);
+  incidentsThisMatch = Math.max(0, incidentsThisMatch - 1);
+  busy = false;
+  done = false;
+}
+
+// ---- wiring ----------------------------------------------------------
 mountBoard($('#board'), i => void play(i));
 mountIncidentLog($('#incident-log'), $('#incident-count'));
 mountToast($('#toast'));
+mountComposureMeter($('#composure-meter'));
+mountEvidenceTally($('#evidence-tally'));
+mountCountermeasureBar($('#countermeasure-bar'), useCountermeasure);
 
 $('#new-game').addEventListener('click', newMatch);
 
 $('#appeal').addEventListener('click', () => {
   if (appealDisabled) return;
-  houseWins++;
-  $('#ai-score').textContent = String(houseWins);
-  incidentsThisMatch++;
-  const msg = houseVoice.appeal(composure.band().id);
+  run.appealFee();
+  incidentsThisMatch += 1;
+  const msg = houseVoice.appeal(run.composure.band().id);
   reportIncident(msg, { statute: '§8 APPEALS', turn });
-  recordEvidence(evidence, { exhibitClass: 'obstruction', statute: '§8 APPEALS', message: msg, turn });
-  composure.nudge(-2);
+  run.bankViolation({ exhibitClass: 'obstruction', statute: '§8 APPEALS', message: msg, turn });
+  run.composure.nudge(-2);
   showToast('APPEAL DENIED · HOUSE +1');
   sfx('register');
-  if (canPressCharges(evidence)) $('#press-charges').hidden = false;
+  refreshMeta();
+  persist();
+});
+
+$('#press-charges').addEventListener('click', () => {
+  showToast('The tribunal convenes in the next update. Keep gathering.');
 });
 
 const camBtn = $('#referee-cam');
@@ -210,11 +338,16 @@ function applyCam() {
 }
 camBtn.addEventListener('click', () => {
   prefs.refereeCam = !prefs.refereeCam;
-  savePrefs();
   applyCam();
+  persist();
 });
 
 setSoundEnabled(prefs.sound);
 applyCam();
 $('#year').textContent = String(new Date().getFullYear());
+status(run.match > 1
+  ? `Match ${String(run.match).padStart(3, '0')}. ${TIERS[run.tier].blurb}`
+  : 'Your move, hotshot.');
+setTurnPill('YOUR TURN');
 paint();
+refreshMeta();

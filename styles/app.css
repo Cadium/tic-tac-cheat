@@ -213,6 +213,53 @@ h1 span { color: var(--red); }
 }
 .new-game:hover { color: var(--ink); background: var(--yellow); }
 .new-game span { font-size: 1.1rem; }
+#press-charges { margin-top: 1.6rem; background: var(--red); }
+#press-charges:hover { color: var(--ink); background: var(--yellow); }
+
+/* ---------- composure meter ---------- */
+.composure { max-width: var(--board-max); margin: 2.3rem auto 0; }
+.composure-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.5rem; }
+.composure-band { font: 500 var(--t-meta) / 1 var(--font-mono); letter-spacing: 0.08em; }
+.composure-track { height: 14px; border: var(--rule); background: var(--paper); }
+.composure-fill {
+  height: 100%;
+  background: var(--red);
+  transition: width var(--dur-stamp) var(--ease-stamp), background var(--dur-stamp);
+}
+.composure[data-band="sweating"] .composure-fill { background: color-mix(in srgb, var(--red) 80%, var(--yellow)); }
+.composure[data-band="unhinged"] .composure-fill,
+.composure[data-band="unravelling"] .composure-fill { background: var(--yellow); }
+.composure.pulse .composure-band { animation: stamped var(--dur-stamp) var(--ease-stamp) both; }
+
+/* ---------- counter-measures ---------- */
+.countermeasures { max-width: var(--board-max); margin: 1.6rem auto 0; }
+.cm-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.6rem; }
+.cm-points { font: 500 var(--t-meta) / 1 var(--font-mono); }
+.cm-points strong { font-size: 0.9rem; }
+.cm-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; background: var(--ink); border: var(--rule); }
+.cm-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 84px;
+  padding: 0.7rem 0.6rem;
+  background: var(--paper);
+  border: 0;
+  font: 500 0.58rem / 1.2 var(--font-mono);
+  text-align: left;
+  cursor: pointer;
+}
+.cm-btn:hover:not(:disabled) { background: var(--yellow); }
+.cm-btn:focus-visible { outline: 4px solid var(--focus); outline-offset: -5px; }
+.cm-btn:disabled { color: var(--muted); cursor: not-allowed; }
+.cm-btn.is-spent { background: color-mix(in srgb, var(--ink) 8%, var(--paper)); }
+.cm-label { font-weight: 500; letter-spacing: 0.02em; }
+.cm-meta { display: flex; justify-content: space-between; margin-top: auto; color: var(--muted); }
+.cm-blurb { min-height: 2.4em; margin: 0.7rem 0 0; color: var(--muted); font: 400 var(--t-fine) / 1.4 var(--font-mono); }
+
+@media (max-width: 560px) {
+  .cm-grid { grid-template-columns: repeat(2, 1fr); }
+}
 
 /* ---------- scorecard ---------- */
 .scorecard { min-width: 0; padding: clamp(2rem, 4vw, 4rem); background: var(--paper); }
@@ -276,6 +323,43 @@ h1 span { color: var(--red); }
   letter-spacing: 0.02em;
 }
 .incident-log li.rewritten { color: var(--red); }
+.incident-tag {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 1px 5px;
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  color: var(--paper);
+  background: var(--ink);
+  vertical-align: middle;
+}
+.incident-tag.leaked { background: var(--red); }
+
+/* ---------- evidence tally ---------- */
+.evidence { margin-top: 1.6rem; }
+.exhibit-list { margin: 0.6rem 0 0; padding: 0; list-style: none; }
+.exhibit-list li {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr auto;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: var(--hair);
+  font: 400 var(--t-fine) / 1.35 var(--font-mono);
+  color: var(--muted);
+}
+.exhibit-list li.has { color: var(--ink); }
+.exhibit-list .ex-letter { font-weight: 500; }
+.exhibit-list .ex-count { font-weight: 500; font-size: 0.72rem; }
+.exhibit-list .corroborated {
+  grid-column: 2 / 4;
+  color: var(--red);
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.evidence-progress { margin: 0.8rem 0 0; color: var(--muted); font: 400 var(--t-fine) / 1.4 var(--font-mono); }
+.evidence-progress.ready { color: var(--red); font-weight: 500; }
 .incident-log .empty-log { padding: 2.5rem 0; color: var(--muted); text-align: center; }
 .incident-log .empty-log::before { display: none; }
 .empty-log span { font-size: 0.6rem; }

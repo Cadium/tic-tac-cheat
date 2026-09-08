@@ -48,6 +48,24 @@ export function record(bank, cheatEvent) {
   return e;
 }
 
+/**
+ * Undo the most recently recorded violations back to a prior log length — used
+ * when a counter-measure erases a turn from the record. Recomputes counts and
+ * total from the surviving log so nothing drifts.
+ */
+export function rollbackTo(bank, logLength) {
+  if (logLength >= bank.log.length) return bank;
+  bank.log.length = Math.max(0, logLength);
+  const counts = {};
+  for (const entry of bank.log) counts[entry.class] = (counts[entry.class] || 0) + 1;
+  for (const id of Object.keys(bank.exhibits)) {
+    if (!counts[id]) delete bank.exhibits[id];
+    else bank.exhibits[id].count = counts[id];
+  }
+  bank.total = bank.log.length;
+  return bank;
+}
+
 /** Whistleblower: an exhibit that stands up in court counts double. */
 export function corroborate(bank, classId) {
   const e = bank.exhibits[classId];

@@ -1,16 +1,17 @@
 {
-  "cycle": 1,
-  "stage": "phase-2 core UI on the v2 engine",
+  "cycle": 2,
+  "stage": "phase-3 meta layer (run economy + counter-measures)",
   "gate": {
     "style_assertions": { "checks": 106, "failures": 0, "status": "PASS" },
-    "engine_tests": { "total": 13, "pass": 13, "invariant_runs": 5000 },
+    "tests": { "total": 19, "pass": 19 },
     "runtime_errors": 0
   },
   "observed": {
-    "near_miss_steal": "fires: chime + held yellow flash, then whistle + stolen animation + offside incident",
-    "escalation": "tier 5 match produced condemnation (§3.2), regulatory capture + gaslighting (§11 x2), mark validity (§4.0), promotional play (§2.4) — 5 violations over 4 turns",
-    "referee_cam": "toggles statute rail on every incident row, persists across reload",
-    "house_voice": "status line varies by composure band"
+    "meta_ui": "composure meter, counter-measure bar, evidence tally all mount and render from persisted run state; no horizontal overflow; all components token-based",
+    "economy": "points = documented violations - spent; counter-measure affordability, per-run caps, and context gating (canUndo / hasExhibits) all enforced",
+    "freeze_frame": "verified E2E in-browser: House O removed, board reverted to post-player-move state, 4 points spent, incident struck, turn stays with the player, House replies normally next move",
+    "press_charges": "button + 'CASE READY' state appear exactly at 5 distinct exhibits OR 15 total; click stubs a toast (tribunal is phase 4)",
+    "persistence": "full run round-trips through localStorage; schema-versioned; corrupt/old blobs fall back to a fresh run"
   },
-  "visual_check": "Shell still matches the live original; Referee Cam toggle shows its active (ink-fill) state when on."
+  "engine_tuning": "place() now plays with purpose (extends an X-free O line) so matches resolve in a median <= 6 turns at every tier — matching the original's pace despite gentler tier-1 cheating."
 }
