@@ -8,7 +8,7 @@
   --shell: #ece5d2;
   --red: #ed3d2b;
   --yellow: #ffd438;
-  --muted: #777164;
+  --muted: #6b6459; /* nudged darker from the original #777164 to clear 4.5:1 on --paper */
   --line: rgba(18, 18, 18, 0.22);
   --focus: #1976d2;
 

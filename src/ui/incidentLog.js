@@ -58,6 +58,7 @@ export function rewriteLastIncident() {
   text.dataset.original = text.textContent;
   text.textContent = pick(REWRITE_RNG, BLAME);
   li.classList.add('rewritten');
+  tagLastIncident('AMENDED BY THE HOUSE', 'amended');
 }
 
 export function setRefereeCam(on) {

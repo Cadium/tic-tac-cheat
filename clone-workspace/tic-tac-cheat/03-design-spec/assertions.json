@@ -3,7 +3,7 @@
   "viewport": "any (checks below are viewport-stable; clamp()-dependent sizes are excluded from the gate and eyeballed instead)",
   "assertions": [
     { "sel": "body", "props": { "backgroundColor": "rgb(244, 239, 223)", "color": "rgb(18, 18, 18)", "marginTop": "0px" } },
-    { "sel": ":root", "vars": { "--ink": "#121212", "--paper": "#f4efdf", "--red": "#ed3d2b", "--yellow": "#ffd438", "--muted": "#777164" } },
+    { "sel": ":root", "vars": { "--ink": "#121212", "--paper": "#f4efdf", "--red": "#ed3d2b", "--yellow": "#ffd438", "--muted": "#6b6459" } },
     { "sel": "main", "props": { "maxWidth": "1440px", "borderLeftWidth": "2px", "borderRightWidth": "2px", "borderLeftStyle": "solid", "borderLeftColor": "rgb(18, 18, 18)" } },
     { "sel": ".intro", "props": { "position": "relative", "overflowX": "hidden", "borderBottomWidth": "2px", "borderBottomColor": "rgb(18, 18, 18)" } },
     { "sel": "h1", "props": { "fontFamily": "\"Space Grotesk\", \"Arial Narrow\", Arial, sans-serif", "fontWeight": "700", "color": "rgb(18, 18, 18)" } },
@@ -29,9 +29,9 @@
     { "sel": ".scores > div + div", "props": { "borderLeftWidth": "2px", "borderLeftColor": "rgb(18, 18, 18)" } },
     { "sel": ".scores strong", "props": { "fontFamily": "\"Space Grotesk\", \"Arial Narrow\", Arial, sans-serif", "fontWeight": "700", "letterSpacing": "-0.09em", "color": "rgb(18, 18, 18)" } },
     { "sel": ".house-score strong", "props": { "color": "rgb(237, 61, 43)" } },
-    { "sel": ".fine-print", "props": { "color": "rgb(119, 113, 100)", "fontFamily": "\"DM Mono\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace" } },
+    { "sel": ".fine-print", "props": { "color": "rgb(107, 100, 89)", "fontFamily": "\"DM Mono\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace" } },
     { "sel": ".incident-log", "props": { "listStyleType": "none", "overflowY": "auto", "borderBottomWidth": "1px" } },
-    { "sel": ".incident-log li", "props": { "position": "relative", "fontFamily": "\"DM Mono\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace", "borderBottomWidth": "1px", "color": "rgb(119, 113, 100)" } },
+    { "sel": ".incident-log li", "props": { "position": "relative", "fontFamily": "\"DM Mono\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace", "borderBottomWidth": "1px", "color": "rgb(107, 100, 89)" } },
     { "sel": ".appeal", "props": { "borderTopWidth": "2px", "borderTopColor": "rgb(18, 18, 18)", "backgroundColor": "rgba(0, 0, 0, 0)", "cursor": "pointer", "fontFamily": "\"DM Mono\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace" } },
     { "sel": "footer", "props": { "backgroundColor": "rgb(18, 18, 18)", "color": "rgb(244, 239, 223)", "display": "flex", "maxWidth": "1440px", "minHeight": "100px" } },
     { "sel": ".toast", "props": { "position": "fixed", "backgroundColor": "rgb(237, 61, 43)", "color": "rgb(244, 239, 223)", "borderTopWidth": "2px", "boxShadow": "rgb(18, 18, 18) 6px 6px 0px 0px" } }

@@ -23,7 +23,7 @@ a tight grotesk for everything loud. It reads like a rigged government form.
 | `--shell` | `#ece5d2` | `rgb(236,229,210)` | game-shell background (was an untokenised literal) |
 | `--red` | `#ed3d2b` | `rgb(237,61,43)` | the House / O / accent / alarm / drop shadow |
 | `--yellow` | `#ffd438` | `rgb(255,212,56)` | you / hover / winning line / highlight |
-| `--muted` | `#777164` | `rgb(119,113,100)` | secondary + fine print |
+| `--muted` | `#6b6459` | `rgb(107,100,89)` | secondary + fine print — nudged darker from the target's `#777164` (4.2:1 on `--paper`) to clear WCAG AA 4.5:1 for small text |
 | `--line` | `rgba(18,18,18,.22)` | — | hairline dividers inside the scorecard |
 | `--focus` | `#1976d2` | `rgb(25,118,210)` | focus outline (was an untokenised literal) |
 

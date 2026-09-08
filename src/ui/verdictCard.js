@@ -6,7 +6,7 @@ const W = 1200;
 const H = 1500;
 
 const C = {
-  ink: '#121212', paper: '#f4efdf', red: '#ed3d2b', yellow: '#ffd438', muted: '#777164',
+  ink: '#121212', paper: '#f4efdf', red: '#ed3d2b', yellow: '#ffd438', muted: '#6b6459',
 };
 
 export function drawVerdictCard(canvas, v) {

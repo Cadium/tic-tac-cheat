@@ -34,6 +34,8 @@ export function openEndgame(run, { onSeason, onGhostDone }) {
     </div>
   `;
 
+  root.querySelector('.endgame h2').setAttribute('tabindex', '-1');
+  root.querySelector('.endgame h2').focus();
   root.querySelector('[data-act="accept"]').addEventListener('click', () => runGhostMatch(run, root, onGhostDone));
   root.querySelector('[data-act="decline"]').addEventListener('click', () => declineEnding(run, root, onSeason));
 }

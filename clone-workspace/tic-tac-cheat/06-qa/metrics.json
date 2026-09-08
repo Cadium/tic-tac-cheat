@@ -1,19 +1,14 @@
 {
-  "cycle": 4,
-  "stage": "phase-5 global counter (Pages Function + KV)",
-  "gate": { "style_assertions": { "checks": 106, "failures": 0, "status": "PASS" }, "tests": { "total": 19, "pass": 19 }, "runtime_errors": 0 },
-  "function_tests_via_curl": {
-    "GET": "returns { houseWins, violations, matches, seasons, humanWins: 0 } seeded",
-    "POST normal": "deltas applied and clamped; totals returned",
-    "POST with humanWins/humanWinsDelta in body": "humanWins stays 0 — it is not a variable",
-    "POST over-cap violationsDelta 99999": "clamped to 30",
-    "POST malformed body / JSON array": "400",
-    "rate limit": "one write per IP-hash per 60s (KV minimum TTL); throttled response returns current totals so the client never breaks",
-    "KV persistence": "verified — totals survive a wrangler restart"
+  "cycle": 5,
+  "stage": "phase-6 polish + verify + deploy prep (FINAL)",
+  "gate": { "style_assertions": { "checks": 106, "failures": 0, "status": "PASS" }, "tests": { "total": 19, "pass": 19 }, "runtime_errors": 0, "console_warnings": 0 },
+  "a11y": {
+    "keyboard": "roving-tabindex board grid + arrow/Home/End; all controls reachable",
+    "screen_reader": "#sr-live announces concrete cheat actions; focus moved to headings on takeover screens; modal Escape/backdrop close",
+    "contrast": "--muted 4.2:1 -> 5.08:1 on paper; informational small red-on-paper text moved to --ink; no colour-only signals",
+    "reduced_motion": "global block neutralises all motion; confetti hidden; near-miss -> static STOLEN stamp"
   },
-  "client": {
-    "offline": "static server (no function) -> GET 404 -> strip still shows THE HOUSE 52,140 - HUMANITY 0 from seed; game unaffected",
-    "online": "verified end-to-end against `wrangler pages dev` — strip synced from GET, then incremented by 1 on match end (52,142 -> 52,143), KV persisted",
-    "optimistic": "local figure bumps immediately on match end; a throttled POST no longer snaps it back"
-  }
+  "responsive": "375 / 768 / desktop verified for match + tribunal + endgame; no horizontal overflow at any width",
+  "assets": "assets/og.png 1200x630 generated in-language; fonts self-hosted + preloaded",
+  "deploy": "Cloudflare Pages, output dir '/', KV binding STANDINGS; steps in README.md + wrangler.toml"
 }

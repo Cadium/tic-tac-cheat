@@ -27,6 +27,35 @@ import { syncStandings, reportOutcome, getStandings, renderStandingsStrip } from
 
 const $ = s => document.querySelector(s);
 const wait = ms => new Promise(r => setTimeout(r, ms));
+
+const SQUARE_NAMES = ['top left', 'top centre', 'top right', 'middle left', 'the centre', 'middle right', 'bottom left', 'bottom centre', 'bottom right'];
+const OBSTRUCT_VERB = {
+  disableAppeal: 'closed the appeals office',
+  rewrite: 'rewrote the incident report to blame you',
+  gaslight: 'suggested that losing is your own fault',
+};
+
+/** Plain-language narration for screen readers — the bureaucratic incident text
+ *  doesn't say which square moved; this does. */
+function narrateCheat(ev) {
+  const at = (ev.cells || []).map(i => SQUARE_NAMES[i]).filter(Boolean).join(' and ');
+  switch (ev.type) {
+    case 'erasure': return `The House removed your mark from ${at || 'the board'}.`;
+    case 'doubleDealing': return `The House took a second move at ${at || 'the board'}.`;
+    case 'structural': return `The House condemned ${at || 'a square'}. It is out of play.`;
+    case 'identityFraud': return `The House changed your mark at ${at || 'the board'} into its own.`;
+    case 'obstruction': return `The House ${OBSTRUCT_VERB[ev.act] || 'interfered with the game'}.`;
+    default: return ev.message;
+  }
+}
+let announceTimer;
+function announce(text) {
+  const el = $('#sr-live');
+  if (!el) return;
+  el.textContent = '';
+  clearTimeout(announceTimer);
+  announceTimer = setTimeout(() => { el.textContent = text; }, 60);
+}
 const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 const shortDelay = ms => (reduced() ? Math.min(ms, 80) : ms);
 
@@ -207,6 +236,7 @@ function applyCheatStep(step) {
   reportIncident(step.message, { statute: ev.statute, turn: ev.turn ?? turn });
   run.bankViolation({ ...ev, turn });
   status(step.message);
+  announce(narrateCheat(ev));
   refreshMeta();
 }
 
@@ -371,6 +401,7 @@ function rollSeason() {
   paint();
   refreshMeta();
   persist();
+  $('#new-game').focus();
 }
 
 $('#house-rules').addEventListener('click', openRulebook);

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>og builder</title>
+    <link rel="stylesheet" href="/assets/fonts.css" />
+    <style>body{margin:0;background:#333}canvas{display:block}</style>
+  </head>
+  <body>
+    <canvas id="c" width="1200" height="630"></canvas>
+    <script type="module">
+      const C = { ink: '#121212', paper: '#f4efdf', red: '#ed3d2b', yellow: '#ffd438', muted: '#6b6459' };
+      const g = document.getElementById('c').getContext('2d');
+
+      function draw() {
+        g.fillStyle = C.paper;
+        g.fillRect(0, 0, 1200, 630);
+
+        // ghost O
+        g.save();
+        g.translate(1010, 470);
+        g.rotate(0.1);
+        g.fillStyle = C.yellow;
+        g.font = '900 620px "Space Grotesk", Arial, sans-serif';
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.fillText('O', 0, 0);
+        g.restore();
+
+        g.strokeStyle = C.ink;
+        g.lineWidth = 8;
+        g.strokeRect(20, 20, 1160, 590);
+
+        g.textAlign = 'left';
+        g.textBaseline = 'alphabetic';
+
+        g.fillStyle = C.ink;
+        g.font = '500 26px "DM Mono", monospace';
+        g.fillText('TIC TAC CHEAT', 72, 108);
+
+        g.font = '700 128px "Space Grotesk", Arial, sans-serif';
+        g.fillText('THE HOUSE', 68, 250);
+        g.fillStyle = C.red;
+        g.fillText('ALWAYS WINS', 68, 372);
+
+        g.fillStyle = C.ink;
+        g.font = '500 30px "DM Mono", monospace';
+        g.fillText("You're X. The House is O.", 72, 452);
+        g.fillText('Normal rules apply to you.', 72, 494);
+
+        g.fillStyle = C.ink;
+        g.fillRect(20, 548, 1160, 62);
+        g.fillStyle = C.paper;
+        g.font = '500 26px "DM Mono", monospace';
+        g.fillText('HUMANITY: 0', 72, 588);
+        g.textAlign = 'right';
+        g.fillText('DOCUMENT THE VIOLATIONS. PRESS CHARGES.', 1150, 588);
+        g.textAlign = 'left';
+      }
+
+      draw();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+      window.__png = () => document.getElementById('c').toDataURL('image/png');
+    </script>
+  </body>
+</html>

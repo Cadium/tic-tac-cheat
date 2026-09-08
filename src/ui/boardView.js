@@ -13,7 +13,36 @@ export function mountBoard(node, onCell) {
   cells = [...node.querySelectorAll('[data-cell]')];
   reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', e => { reduced = e.matches; });
-  cells.forEach((cell, i) => cell.addEventListener('click', () => onCell(i)));
+
+  // Roving tabindex: one tab stop for the grid, arrow keys move between cells.
+  cells.forEach((cell, i) => {
+    cell.tabIndex = i === 0 ? 0 : -1;
+    cell.addEventListener('click', () => onCell(i));
+    cell.addEventListener('keydown', e => handleGridKey(e, i));
+  });
+}
+
+const MOVES = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 3, ArrowUp: -3 };
+
+function handleGridKey(e, i) {
+  let next = i;
+  if (e.key in MOVES) {
+    const step = MOVES[e.key];
+    const row = Math.floor(i / 3);
+    if ((step === 1 || step === -1) && Math.floor((i + step) / 3) !== row) return; // don't wrap rows
+    next = i + step;
+  } else if (e.key === 'Home') next = row0(i);
+  else if (e.key === 'End') next = row0(i) + 2;
+  else return;
+  if (next < 0 || next > 8) return;
+  e.preventDefault();
+  focusCell(next);
+}
+const row0 = i => Math.floor(i / 3) * 3;
+
+function focusCell(i) {
+  cells.forEach((c, j) => { c.tabIndex = j === i ? 0 : -1; });
+  cells[i].focus();
 }
 
 /**
@@ -41,6 +70,12 @@ export function renderBoard(board, opts = {}) {
     const state = mark ? NARRATE[mark] : condemned.has(i) ? 'condemned' : 'empty';
     cell.setAttribute('aria-label', `${POSITIONS[i]}, ${state}`);
   });
+
+  // Keep the single tab stop on a cell that can actually take focus.
+  if (!cells.some(c => c.tabIndex === 0 && !c.disabled)) {
+    const first = cells.find(c => !c.disabled) ?? cells[0];
+    cells.forEach(c => { c.tabIndex = c === first ? 0 : -1; });
+  }
 }
 
 /** The near-miss: hold the completed line for a beat so the player feels it. */

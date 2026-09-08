@@ -66,6 +66,9 @@ export function openTribunal(run, { onContinue, standings = null }) {
     </div>
   `;
 
+  root.querySelector('.tribunal-head h2').setAttribute('tabindex', '-1');
+  root.querySelector('.tribunal-head h2').focus();
+
   const docket = root.querySelector('.exhibit-docket');
   const fill = root.querySelector('.opinion-fill');
   const note = root.querySelector('.opinion-note');

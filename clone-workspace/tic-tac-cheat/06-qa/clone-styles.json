@@ -858,7 +858,7 @@
   "boxShadow": "none"
  },
  ".fine-print": {
-  "color": "rgb(119, 113, 100)",
+  "color": "rgb(107, 100, 89)",
   "backgroundColor": "rgba(0, 0, 0, 0)",
   "backgroundImage": "none",
   "fontFamily": "\"DM Mono\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace",
@@ -885,13 +885,13 @@
   "containerType": "normal",
   "borderTopWidth": "0px",
   "borderTopStyle": "none",
-  "borderTopColor": "rgb(119, 113, 100)",
+  "borderTopColor": "rgb(107, 100, 89)",
   "borderRightWidth": "0px",
   "borderBottomWidth": "0px",
   "borderLeftWidth": "0px",
   "borderLeftStyle": "none",
-  "borderLeftColor": "rgb(119, 113, 100)",
-  "borderBottomColor": "rgb(119, 113, 100)",
+  "borderLeftColor": "rgb(107, 100, 89)",
+  "borderBottomColor": "rgb(107, 100, 89)",
   "borderTopLeftRadius": "0px",
   "marginTop": "0px",
   "boxShadow": "none"
@@ -936,7 +936,7 @@
   "boxShadow": "none"
  },
  ".incident-log li": {
-  "color": "rgb(119, 113, 100)",
+  "color": "rgb(107, 100, 89)",
   "backgroundColor": "rgba(0, 0, 0, 0)",
   "backgroundImage": "none",
   "fontFamily": "\"DM Mono\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace",
@@ -963,12 +963,12 @@
   "containerType": "normal",
   "borderTopWidth": "0px",
   "borderTopStyle": "none",
-  "borderTopColor": "rgb(119, 113, 100)",
+  "borderTopColor": "rgb(107, 100, 89)",
   "borderRightWidth": "0px",
   "borderBottomWidth": "1px",
   "borderLeftWidth": "0px",
   "borderLeftStyle": "none",
-  "borderLeftColor": "rgb(119, 113, 100)",
+  "borderLeftColor": "rgb(107, 100, 89)",
   "borderBottomColor": "rgba(18, 18, 18, 0.22)",
   "borderTopLeftRadius": "0px",
   "marginTop": "0px",
@@ -1110,6 +1110,6 @@
   "--paper": "#f4efdf",
   "--red": "#ed3d2b",
   "--yellow": "#ffd438",
-  "--muted": "#777164"
+  "--muted": "#6b6459"
  }
 }
