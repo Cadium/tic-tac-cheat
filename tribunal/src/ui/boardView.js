@@ -14,6 +14,7 @@ const gridRef = i => `R${Math.floor(i / N) + 1}C${(i % N) + 1}`;
 let cells = [];
 let boardEl;
 let reduced = false;
+let keyboardMode = false;
 
 export function mountBoard(node, onCell) {
   boardEl = node;
@@ -28,11 +29,66 @@ export function mountBoard(node, onCell) {
     b.className = 'cell';
     b.dataset.cell = String(i);
     b.setAttribute('role', 'gridcell');
+    b.setAttribute('aria-rowindex', String(Math.floor(i / N) + 1));
+    b.setAttribute('aria-colindex', String((i % N) + 1));
     b.tabIndex = i === 0 ? 0 : -1;
     b.addEventListener('click', () => onCell(i));
+    b.addEventListener('keydown', e => handleGridKey(e, i));
     node.append(b);
     return b;
   });
+
+  node.addEventListener('keydown', () => { keyboardMode = true; });
+  node.addEventListener('pointerdown', () => { keyboardMode = false; });
+}
+
+/**
+ * After the board becomes interactive again, pull focus back to a playable cell
+ * — but only for keyboard players, so a mouse click never sprouts a focus ring.
+ */
+export function restoreBoardFocus() {
+  if (!keyboardMode) return;
+  const active = document.activeElement;
+  const lost = active === document.body
+    || (active instanceof HTMLElement && active.classList.contains('cell') && active.disabled);
+  if (!lost) return;
+  const target = cells.find(c => c.tabIndex === 0 && !c.disabled) ?? cells.find(c => !c.disabled);
+  target?.focus();
+}
+
+// Roving tabindex: the grid is one tab stop; arrow keys move within it, skipping
+// cells that are already played and never wrapping rows. Home/End jump to the
+// nearest playable cell at the ends of the current row.
+const STEP = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: N, ArrowUp: -N };
+
+function handleGridKey(e, i) {
+  const row = Math.floor(i / N);
+  const horizontal = ['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key);
+  let dir = 0;
+  let from = i;
+
+  if (e.key in STEP) {
+    dir = STEP[e.key];
+  } else if (e.key === 'Home') {
+    dir = 1; from = row * N - 1;
+  } else if (e.key === 'End') {
+    dir = -1; from = row * N + N;
+  } else {
+    return;
+  }
+
+  let next = from + dir;
+  while (next >= 0 && next < cells.length) {
+    if (horizontal && Math.floor(next / N) !== row) break; // no row wrap
+    if (!cells[next].disabled) { e.preventDefault(); focusCell(next); return; }
+    next += dir;
+  }
+  if (from !== i) e.preventDefault(); // Home/End with nothing playable: swallow
+}
+
+function focusCell(i) {
+  cells.forEach((c, j) => { c.tabIndex = j === i ? 0 : -1; });
+  cells[i].focus();
 }
 
 /**

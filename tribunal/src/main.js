@@ -9,7 +9,7 @@ import { playerThreat } from './engine/threats.js';
 import {
   mountBoard, renderBoard, cellName, gridRef,
   markLanded, stampCondemn, oDropped, highlightThreat, clearThreat,
-  freezeBoard, thawBoard,
+  freezeBoard, thawBoard, restoreBoardFocus,
 } from './ui/boardView.js';
 import { mountWarrants, render as renderWarrants, strike as strikeWarrant } from './ui/warrants.js';
 import { mountIncidentLog, reset as resetLog, recordCondemn } from './ui/incidentLog.js';
@@ -55,6 +55,19 @@ function setStatus(text, { win = false, compelled = false } = {}) {
   statusEl.classList.toggle('compelled', compelled);
 }
 const warrantsPhrase = n => (n === 0 ? 'no warrants left' : `${n} warrant${n === 1 ? '' : 's'} left`);
+
+// The visible #status flickers through the staged beats of a forced turn; this
+// pushes one settled sentence to a separate polite region so a screen reader
+// gets the outcome, not every frame of the animation.
+const liveEl = $('#live');
+let announceTimer;
+function announce(text) {
+  liveEl.textContent = '';
+  clearTimeout(announceTimer);
+  // a real timeout, not rAF — rAF stalls in a background tab and the message
+  // would be lost; the empty tick lets an identical message repeat.
+  announceTimer = setTimeout(() => { liveEl.textContent = text; }, 60);
+}
 
 // ---- end of match -------------------------------------------------
 function finishMatch() {
@@ -111,6 +124,7 @@ async function play(cell) {
         playerWin: threat.winLine ?? threat.lineCells,
       });
       setStatus('THE HOUSE FORFEITS. You forced its hand with nothing left to spend.', { win: true });
+      announce('The House is compelled again with no warrant left. The House forfeits. You win.');
       sfx('win');
       seedLineEl.textContent += ' · forfeit forced';
       busy = false;
@@ -137,6 +151,10 @@ async function play(cell) {
       `Warrant ${STANDARD_BUDGET - match.warrants} spent — ${warrantsPhrase(match.warrants)}.`,
       { compelled: true },
     );
+    announce(
+      `You forced the House. It condemned ${cellName(step.condemnedCell)} and spent a warrant. ` +
+      `The House has ${warrantsPhrase(match.warrants)}. Your move.`,
+    );
     if (!await beat(gen, 540)) return;
   }
 
@@ -148,6 +166,7 @@ async function play(cell) {
 
   if (match.outcome === 'house') {
     setStatus('THE HOUSE WINS THE BOARD. It never had to spend everything.');
+    announce('The House completed four in a row. The House wins the board.');
     sfx('lose');
     busy = false;
     finishMatch();
@@ -156,8 +175,10 @@ async function play(cell) {
     setStatus(`Your move. The House has ${warrantsPhrase(match.warrants)}.`);
   } else {
     setStatus('Your move.');
+    announce('Your move.');
   }
   busy = false;
+  restoreBoardFocus();
 }
 
 // ---- new match ---------------------------------------------------
@@ -176,6 +197,7 @@ function start(seed, viaLink) {
   renderWarrants(STANDARD_BUDGET);
   renderBoard(match.board, { condemned: match.condemned, locked: false });
   setStatus('Your move.');
+  announce('New hearing. You are X. The House has four warrants. Your move.');
   seedLineEl.textContent =
     `seed ${seed} · ${STANDARD_BUDGET} warrants${viaLink ? ' · shared link' : ''}`;
 }

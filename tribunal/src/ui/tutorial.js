@@ -84,6 +84,9 @@ function render() {
   els.root.classList.toggle('awaiting', s.button == null);
   document.getElementById('warrants')?.classList.toggle('coach-focus', step === 2);
   els.root.hidden = false;
+  // steps that ask the reader to continue take focus so keyboard users can;
+  // the gated first step leaves focus on the board so they can play.
+  if (s.button != null) els.next.focus();
 }
 
 function finish() {

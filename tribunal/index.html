@@ -32,7 +32,9 @@
 
       <section class="court" aria-label="The match">
         <div class="court-main">
-          <p id="status" class="status" role="status" aria-live="polite">Your move.</p>
+          <!-- visual only; the screen-reader voice is #live, to avoid the
+               status / warrants / incident log all narrating the same event -->
+          <p id="status" class="status" aria-hidden="true">Your move.</p>
 
           <div class="board-wrap">
             <div
@@ -66,7 +68,7 @@
           <div class="ledger" id="ledger">
             <div class="warrants-block">
               <p class="label">WARRANTS ON FILE</p>
-              <div id="warrants" class="warrants" aria-live="polite"></div>
+              <div id="warrants" class="warrants" role="img" aria-label="4 of 4 warrants on file"></div>
             </div>
             <div class="ledger-acts">
               <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="false">Sound off</button>
@@ -76,8 +78,8 @@
         </div>
 
         <aside class="court-aside" aria-label="Incident log">
-          <p class="label">INCIDENT LOG</p>
-          <ol id="incident-log" class="incident-log" aria-live="polite">
+          <p class="label" id="incident-log-label">INCIDENT LOG</p>
+          <ol id="incident-log" class="incident-log" aria-labelledby="incident-log-label">
             <li class="empty">No incidents recorded.</li>
           </ol>
         </aside>
@@ -105,6 +107,6 @@
       </div>
     </div>
 
-    <div id="live" class="sr-only" role="status" aria-live="assertive"></div>
+    <div id="live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
   </body>
 </html>
