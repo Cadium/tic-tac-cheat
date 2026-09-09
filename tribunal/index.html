@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4efdf" />
+    <meta name="description" content="A rigged 5×5. The House cannot lose the board — but every time you force its hand it must condemn a square and spend a warrant. Empty the warrants and it forfeits." />
+    <meta property="og:title" content="Tic Tac Cheat — Tribunal Mode" />
+    <meta property="og:description" content="The House holds four warrants. Force five compelled condemnations and it forfeits." />
+    <meta property="og:image" content="/assets/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Tic Tac Cheat — Tribunal Mode</title>
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/space-grotesk-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/dm-mono-500-latin.woff2" crossorigin />
+    <link rel="stylesheet" href="/assets/fonts.css" />
+    <link rel="stylesheet" href="/styles/tokens.css" />
+    <link rel="stylesheet" href="/tribunal/styles/app.css" />
+    <script type="module" src="/tribunal/src/main.js"></script>
+  </head>
+  <body>
+    <main class="tribunal">
+      <header class="masthead">
+        <p class="kicker">TIC TAC CHEAT · DOCKET</p>
+        <h1>TRIBUNAL<br /><span>MODE</span></h1>
+        <p class="lede">
+          You are X. The House is O and cannot lose the board. But force its hand —
+          complete a line, or hold two threats at once — and it must
+          <b>condemn</b> the square you need and burn a <b>warrant</b>. It holds
+          four. Force the fifth compelled condemnation and the House forfeits.
+        </p>
+      </header>
+
+      <section class="court" aria-label="The match">
+        <div class="court-main">
+          <!-- visual only; the screen-reader voice is #live, to avoid the
+               status / warrants / incident log all narrating the same event -->
+          <p id="status" class="status" aria-hidden="true">Your move.</p>
+
+          <div class="board-wrap">
+            <div
+              id="board"
+              class="board"
+              role="grid"
+              aria-label="5 by 5 board, four in a row"
+            ></div>
+
+            <section
+              id="summary"
+              class="summary"
+              aria-labelledby="summary-verdict"
+              hidden
+            >
+              <p class="label">FINAL DISPOSITION</p>
+              <h2 id="summary-verdict" tabindex="-1">—</h2>
+              <dl class="summary-stats">
+                <div><dt>Turns</dt><dd id="summary-turns">—</dd></div>
+                <div><dt>Warrants forced</dt><dd id="summary-forced">—</dd></div>
+                <div><dt>Squares condemned</dt><dd id="summary-condemned">—</dd></div>
+              </dl>
+              <div class="summary-acts">
+                <button id="summary-replay" class="act" type="button">REPLAY THIS MATCH</button>
+                <button id="summary-new" class="act" type="button">NEW MATCH <span aria-hidden="true">↗</span></button>
+                <button id="summary-copy" class="sound-toggle" type="button">Copy replay link</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="ledger" id="ledger">
+            <div class="warrants-block">
+              <p class="label">WARRANTS ON FILE</p>
+              <div id="warrants" class="warrants" role="img" aria-label="4 of 4 warrants on file"></div>
+            </div>
+            <div class="ledger-acts">
+              <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="false">Sound off</button>
+              <button id="new-match" class="act" type="button">NEW MATCH <span aria-hidden="true">↗</span></button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="court-aside" aria-label="Incident log">
+          <p class="label" id="incident-log-label">INCIDENT LOG</p>
+          <ol id="incident-log" class="incident-log" aria-labelledby="incident-log-label">
+            <li class="empty">No incidents recorded.</li>
+          </ol>
+        </aside>
+      </section>
+
+      <footer class="colophon">
+        <p>THE HOUSE DEPARTMENT OF SCORING · <a href="/">← Comedy Mode</a></p>
+        <p id="seed-line" class="fine"></p>
+      </footer>
+    </main>
+
+    <div
+      id="tutorial"
+      class="coach"
+      role="region"
+      aria-label="How to play"
+      aria-live="polite"
+      hidden
+    >
+      <p class="label">HEARING · ORIENTATION</p>
+      <p id="coach-body">—</p>
+      <div class="coach-acts">
+        <button id="coach-next" class="act" type="button">NEXT</button>
+        <button id="coach-skip" class="sound-toggle" type="button">Skip</button>
+      </div>
+    </div>
+
+    <div id="live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+  </body>
+</html>
